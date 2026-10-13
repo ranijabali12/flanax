@@ -232,7 +232,7 @@
     if (s.line !== line) setLine(s.line, true);
     const changed = s !== sku; sku = s;
     $$('#skuList .sku').forEach(b => { const on = b.dataset.id === id; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on); });
-    const rows = [['Princípio ativo', s.ativo], ['Concentração', s.dose], ['Composição', s.equiv], ['Apresentação', s.qtyLabel], ['Detalhe', s.extra], ['Bula', 'Veja indicações e cuidados abaixo']];
+    const rows = [['Princípio ativo', s.ativo], ['Concentração', s.dose], ['Composição', s.equiv], ['Apresentação', s.qtyLabel], ['Detalhe', s.extra], ['Bula', 'Veja indicações e cuidados abaixo'], ...(window.LOJAS && LOJAS.chips(s.id) ? [['Comprar', LOJAS.chips(s.id)]] : [])];
     $('#sheet').innerHTML = `<div class="sheet__head"><span class="eyebrow">Ficha do produto</span><h3 class="sheet__name">${s.line === 'xr' ? 'Flanax <b>XR</b>' : 'Flanax'} ${s.dose}</h3><span class="sheet__formula">${s.formula}</span></div>
       <dl>${rows.map(([k, v], i) => `<div class="sheet__row" style="--i:${i}"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
     renderBula(s);
@@ -360,6 +360,22 @@
     msg.innerHTML = `Farmácias perto de ${cep.value}: <a href="${url}" target="_blank" rel="noopener">abrir no mapa ↗</a>`;
     window.open(url, '_blank', 'noopener');
   });
+
+  /* ---------- Farmácias perto de mim e compra on-line ---------- */
+  $('#geoBtn').addEventListener('click', () => {
+    const open = url => { msg.innerHTML = `Farmácias perto de você: <a href="${url}" target="_blank" rel="noopener">abrir no mapa ↗</a>`; window.open(url, '_blank', 'noopener'); };
+    if (!navigator.geolocation) return open('https://www.google.com/maps/search/farm%C3%A1cia');
+    msg.textContent = 'Procurando sua localização…';
+    navigator.geolocation.getCurrentPosition(
+      p => open(`https://www.google.com/maps/search/farm%C3%A1cia/@${p.coords.latitude.toFixed(5)},${p.coords.longitude.toFixed(5)},15z`),
+      () => { msg.textContent = 'Não foi possível usar sua localização. Digite seu CEP acima.'; cep.focus(); },
+      { timeout: 8000, maximumAge: 300000 });
+  });
+  const BUY_ITEMS = SKUS.map(s => [s.id, title(s), s.qtyLabel]);
+  if (window.LOJAS) $('#buyRows').innerHTML = BUY_ITEMS.map(([id, nome, sub], i) => {
+    const c = LOJAS.chips(id); if (!c) return '';
+    return `<div class="buylist__row" style="--i:${i}"><div class="buylist__name"><b>${nome}</b><span>${sub}</span></div>${c}</div>`;
+  }).join('');
 
   /* ---------- Busca (Ctrl K) ---------- */
   const pal = $('#palette'), pin = $('#paletteInput'), plist = $('#paletteList');

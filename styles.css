@@ -486,3 +486,23 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 2px 6px; border-radi
 .bula__table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: var(--t-12); }
 .bula__table th, .bula__table td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .bula__table th { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 500; }
+
+/* ---------- Compra on-line ---------- */
+.finder__geo { display: inline-flex; align-items: center; gap: var(--s-1); height: 44px; padding: 0 var(--s-2); border-radius: var(--r-pill); font-weight: 600; color: inherit; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35); transition: background var(--t-mid) var(--ease), box-shadow var(--t-mid) var(--ease); justify-self: start; }
+.finder__geo svg { width: 18px; height: 18px; }
+.finder__geo:hover { background: rgba(255, 255, 255, .12); box-shadow: inset 0 0 0 1px #fff; }
+.buy { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.buy__chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: var(--r-pill); font-size: var(--t-12); font-weight: 600; color: var(--ink); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line-2); white-space: nowrap; transition: background var(--t-mid) var(--ease), color var(--t-mid) var(--ease), box-shadow var(--t-mid) var(--ease); }
+.buy__chip span { opacity: .55; transition: transform var(--t-mid) var(--ease); }
+.buy__chip:hover { background: var(--ink); color: var(--bg); box-shadow: none; }
+.buy__chip:hover span { transform: translate(2px, -2px); opacity: 1; }
+.buylist { margin-top: var(--s-5); display: grid; gap: var(--s-3); padding: var(--s-5); border-radius: var(--r-4); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.buylist__head { display: grid; gap: var(--s-1); }
+.buylist__head h3 { margin: 0; font-size: var(--t-32); line-height: 1; }
+.buylist__head p { margin: 0; color: var(--muted); }
+.buylist__rows { display: grid; }
+.buylist__row { display: grid; grid-template-columns: minmax(200px, 280px) 1fr; gap: var(--s-2); align-items: center; padding: var(--s-2) 0; border-top: 1px solid var(--line); animation: rowIn var(--t-slow) var(--ease) both; animation-delay: calc(var(--i) * 40ms); }
+.buylist__name { display: grid; gap: 2px; }
+.buylist__name span { font-size: var(--t-12); color: var(--muted); }
+.buylist__note { margin: 0; font-size: var(--t-12); color: var(--muted); font-family: var(--f-mono); }
+@media (max-width: 720px) { .buylist { padding: var(--s-3); } .buylist__row { grid-template-columns: 1fr; gap: var(--s-1); } }
