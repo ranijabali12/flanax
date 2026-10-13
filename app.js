@@ -239,12 +239,39 @@
     $('#viewerFallback').innerHTML = flat(s);
     if (GL && (changed || instant)) { GL.viewer.setProduct(s, instant || reduced); if (changed && !instant && !reduced) vy += 360; }
   }
-  let bulaTab = 'indicacoes';
-  function renderBula(s) {
-    const B = BULA[s.line], T = [['indicacoes', 'Indicações'], ['contra', 'Contraindicações'], ['adv', 'Advertências'], ['reacoes', 'Reações adversas']];
+  let bulaTab = 'indicacao';
+  const bulaCache = {};
+  const esc = t => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  // Bula completa: títulos numerados, tópicos, e a tabela de efeitos adversos (linhas com tabulação)
+  function bulaHTML(txt) {
+    const lines = txt.split('\n').map(l => l.trim()).filter(Boolean);
+    let html = '', rows = [];
+    const flush = () => { if (!rows.length) return; html += `<div class="bula__tw"><table class="bula__table"><thead><tr>${rows[0].map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(r => `<tr>${(r.length === 2 ? ['', ...r] : r).map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`; rows = []; };
+    for (const l of lines) {
+      if (l.includes('\t')) { rows.push(l.split('\t')); continue; }
+      flush();
+      if (/^\d+\.\s/.test(l) || /^[A-ZÁÉÍÓÚÂÊÔÃÕÇ ]{6,}$/.test(l)) html += `<h4>${esc(l)}</h4>`;
+      else html += `<p>${esc(l.replace(/^•\s*/, '• '))}</p>`;
+    }
+    flush();
+    return html;
+  }
+  async function renderBula(s) {
+    const B = BULA[s.bulaKey], T = [['indicacao', 'Indicação'], ['posologia', 'Posologia'], ['contra', 'Contraindicações'], ['adv', 'Advertências'], ['reacoes', 'Reações adversas'], ['bula', 'Bula completa']];
     $('#bulaTitle').textContent = s.line === 'xr' ? 'Flanax XR 660 mg' : `Flanax ${s.dose}`;
     $('#bulaTabs').innerHTML = T.map(([k, n]) => `<button class="bula__tab${k === bulaTab ? ' is-on' : ''}" role="tab" aria-selected="${k === bulaTab}" data-k="${k}">${n}</button>`).join('');
-    $('#bulaBody').innerHTML = `<ul class="bula__list">${B[bulaTab].map((t, i) => `<li style="--i:${i}">${t}</li>`).join('')}</ul>`;
+    const body = $('#bulaBody');
+    if (bulaTab !== 'bula') {
+      const head = bulaTab === 'contra' ? '<p class="bula__lead">Não consumir o remédio em caso de:</p>' : '';
+      body.innerHTML = head + `<ul class="bula__list">${B[bulaTab].map((t, i) => `<li style="--i:${i}">${esc(t)}</li>`).join('')}</ul>`;
+      return;
+    }
+    body.innerHTML = '<p class="bula__lead">Carregando a bula…</p>';
+    try {
+      const k = s.bulaKey;
+      bulaCache[k] = bulaCache[k] || await (await fetch(`assets/bula/${k}.txt`)).text();
+      if (bulaTab === 'bula' && sku.bulaKey === k) body.innerHTML = `<div class="bula__full">${bulaHTML(bulaCache[k])}</div>`;
+    } catch (e) { body.innerHTML = '<p class="bula__lead">Não foi possível carregar a bula agora. Tente de novo.</p>'; }
   }
   $('#bulaTabs').addEventListener('click', e => { const b = e.target.closest('.bula__tab'); if (!b) return; bulaTab = b.dataset.k; renderBula(sku); });
   $$('.switch__btn').forEach(b => b.addEventListener('click', () => { setLine(b.dataset.line); history.replaceState(null, '', '#' + sku.id); }));

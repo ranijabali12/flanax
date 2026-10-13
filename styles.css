@@ -471,3 +471,13 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 2px 6px; border-radi
 .bula__list li::before { content: ""; position: absolute; left: 6px; top: 20px; width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 30%, transparent); }
 .bula__note { font-size: var(--t-12); color: var(--muted); font-family: var(--f-mono); }
 @media (max-width: 640px) { .bula { padding: var(--s-3); } }
+
+.bula__lead { color: var(--muted); font-weight: 600; }
+.bula__full { max-height: 560px; overflow-y: auto; padding-right: var(--s-2); display: grid; gap: 12px; max-width: 86ch; }
+.bula__full h4 { margin: var(--s-2) 0 0; font-family: var(--f-logo); font-weight: 800; font-size: var(--t-16); color: var(--royal); }
+:root[data-theme="dark"] .bula__full h4 { color: var(--yellow); }
+.bula__full p { margin: 0; color: var(--ink-2); font-size: var(--t-14); }
+.bula__tw { overflow-x: auto; border-radius: var(--r-2); box-shadow: inset 0 0 0 1px var(--line); }
+.bula__table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: var(--t-12); }
+.bula__table th, .bula__table td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.bula__table th { font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 500; }

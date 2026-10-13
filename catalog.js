@@ -174,7 +174,7 @@ window.FX = (() => {
     { id: 'flanax-550-15', line: 'flanax', name: 'Flanax', dose: '550 mg', doseNum: '550', qty: 15, qtyLabel: '15 comprimidos revestidos', claim: 'intensa', topBar: true, strip: true, vb: 824,
       box: { w: 300, h: 247, d: 80 }, equiv: 'Equivale a 500 mg de naproxeno', extra: 'Comprimido revestido azul, oblongo' },
     { id: 'flanax-xr', line: 'xr', name: 'Flanax XR', dose: '660 mg', doseNum: '660', qty: 8, qtyLabel: '8 comprimidos revestidos de liberação prolongada', vb: 740, isNew: true,
-      box: { w: 320, h: 237, d: 62 }, equiv: 'Dupla camada: 264 mg de liberação imediata + 396 mg de liberação prolongada', extra: 'Comprimido revestido azul, redondo' }
+      box: { w: 320, h: 237, d: 62 }, equiv: 'Dupla camada: 264 mg de liberação imediata + 396 mg de liberação prolongada', extra: 'Comprimido revestido azulado e ovalado, com a marcação Bayer e 660' }
   ];
 
   // Frente = a própria arte da embalagem (foto endireitada), proporção real de cada caixa
@@ -187,6 +187,7 @@ window.FX = (() => {
     s.ratio = ART_RATIO[s.id];
     s.box.h = Math.round(s.box.w / s.ratio);
     s.ativo = 'Naproxeno sódico';
+    s.bulaKey = s.line === 'xr' ? 'xr' : s.doseNum;
     s.formula = 'C₁₄H₁₃NaO₃';
     const xr = s.line === 'xr', orange = s.claim === 'intensa';
     const topPart = s.topBar ? 64 / s.vb : 0;
@@ -207,19 +208,83 @@ window.FX = (() => {
     xr: { key: 'xr', name: 'Flanax XR', lead: 'Naproxeno sódico 660 mg em comprimido de dupla camada: uma parte de liberação imediata e outra de liberação prolongada.' }
   };
 
-  // Informações de bula (conforme flanax.com.br e bula Anvisa). Texto resumido; não substitui a bula.
-  const BULA_BASE = {
-    indicacoes: ['Alívio de dores agudas com componente inflamatório: dor no corpo, nas costas, nas pernas, na coluna e dor ciática', 'Dor de garganta, de dente, abdominal e pélvica, e dor de cabeça', 'Dores musculares e nas articulações, e dor após traumas leves (entorses, distensões)', 'Dor e febre em adultos, inclusive sintomas de gripe e resfriado'],
-    contra: ['Alergia ao naproxeno ou a qualquer componente da fórmula', 'Histórico de asma, urticária ou outras reações alérgicas provocadas pelo ácido acetilsalicílico ou por outros anti-inflamatórios (AINEs)', 'Histórico de sangramento ou perfuração gastrointestinal relacionado a AINEs, ou úlcera péptica ativa ou recorrente', 'Insuficiência cardíaca grave', 'Suspeita de dengue, pelo risco de sangramento', 'Gravidez: usar somente sob orientação médica'],
-    adv: ['Use a menor dose eficaz pelo menor tempo necessário. Não use por mais de 10 dias seguidos sem orientação médica', 'Idosos e pessoas com histórico de úlcera têm maior risco de complicações gastrointestinais. Interrompa o uso em caso de sangramento ou úlcera', 'Reações graves de pele são raras, mas podem ocorrer, sobretudo no início do tratamento. Pare o uso ao primeiro sinal de erupção cutânea', 'Cuidado em pessoas com pressão alta ou insuficiência cardíaca: pode haver retenção de líquido e inchaço', 'Pessoas com problemas nos rins ou no fígado devem usar sob supervisão médica', 'Não use junto com outros anti-inflamatórios'],
-    reacoes: ['Comuns: tontura, dor de cabeça, náusea, azia e dor abdominal', 'Incomuns a raras: vômitos, inchaço (edema) e febre', 'Muito raras e graves: reação alérgica grave (anafilaxia), sangramento ou perfuração gastrointestinal e alterações no sangue', 'AINEs estão associados a pequeno aumento do risco de infarto e AVC']
-  };
+  // Textos do site oficial do Flanax (fornecidos pelo cliente); bula completa em assets/bula/*.txt
   const BULA = {
-    'flanax': { ...BULA_BASE, adv: [...BULA_BASE.adv, 'Contém sódio: 25 mg por comprimido de 275 mg e 50 mg por comprimido de 550 mg'] },
-    'xr': { ...BULA_BASE,
-      contra: [...BULA_BASE.contra, 'Não indicado para menores de 12 anos'],
-      adv: [...BULA_BASE.adv, 'Comprimido de liberação prolongada: engula inteiro, sem partir ou mastigar. Uso adulto'],
-      reacoes: [...BULA_BASE.reacoes, 'Também relatados: sonolência, vertigem e insônia'] }
+    "275": {
+      "indicacao": [
+        "Promove o alívio das dores causadas por inflamação; dor e febre em adultos, sintomas de gripe e resfriado; dores musculares e articulares."
+      ],
+      "posologia": [
+        "1 comprimido, 1 a 2 vezes por dia ou a critério médico. Indicado para o tratamento de dor e febre em adultos, sintomas de gripe e resfriado; dores musculares e articulares; dor após traumas: entorses, distensões, contusões, lesões leves decorrentes de prática esportiva."
+      ],
+      "contra": [
+        "Gravidez, durante amamentação",
+        "Alergia a naproxeno ou naproxeno sódico",
+        "Ser paciente sensível ou alérgico ao ácido acetilsalicílico ou outros medicamentos anti-inflamatórios e analgésicos",
+        "Apresentar úlcera péptica ativa, sangramento gastrointestinal; ou com um histórico dessas condições",
+        "Tem insuficiência cardíaca grave, insuficiência renal e / ou hepática."
+      ],
+      "adv": [
+        "Flanax® deve  ser  utilizado  na dose recomendada  pelo  menor  tempo necessário para controlar os sintomas. Não é recomendado o uso de Flanax® por mais de 10 dias consecutivos, a não ser sob orientação médica. Se a dor ou a febre persistirem ou se os sintomas mudarem, o médico deverá ser consultado.",
+        "Se os sintomas persistirem, consulte o seu médico.",
+        "Mantenha fora do alcance das crianças.",
+        "Notifique a suspeita de reação adversa para o e-mail: sac@bayer.com ou entre em contato com o nosso Serviço de Atendimento ao Consumidor pelo telefone 0800 723 1010"
+      ],
+      "reacoes": [
+        "Azia, náuseas, cólicas, dores de estômago e de barriga, dores de cabeça, inchaço dos pés e das mãos, zumbidos nos ouvidos, vertigens e tonturas. Se isso acontecer, pare o medicamento imediatamente e consulte o seu médico."
+      ]
+    },
+    "550": {
+      "indicacao": [
+        "Promove o alívio das dores causadas por inflamação; dor após traumas: entorses, distensões, contusões, lesões leves decorrentes de prática esportiva."
+      ],
+      "posologia": [
+        "Tomar 1 comprimido 1 vez por dia ou a critério médico. A dose diária (24 horas) de 550 mg não deve ser excedida, salvo prescrição médica. Crianças menores de 12 anos não devem tomar este produto, salvo sob orientação médica. Flanax®  deve ser utilizado na dose recomendada pelo menor tempo necessário para controlar os sintomas. Não é recomendado o uso de Flanax®  por mais de 10 dias consecutivos, a não ser sob orientação médica. Se a dor ou a febre persistirem ou se os sintomas mudarem, o médico deverá ser consultado. Indicado para o tratamento de dor e febre em adultos, sintomas de gripe e resfriado; dores musculares e articulares; dor após traumas: entorses, distensões, contusões, lesões leves decorrentes de prática esportiva."
+      ],
+      "contra": [
+        "Gravidez, durante amamentação",
+        "Alergia a naproxeno ou naproxeno sódico",
+        "Ser paciente sensível ou alérgico ao ácido acetilsalicílico ou outros medicamentos anti-inflamatórios e analgésicos",
+        "Apresentar úlcera péptica ativa, sangramento gastrointestinal; ou com um histórico dessas condições",
+        "Tem insuficiência cardíaca grave, insuficiência renal e / ou hepática."
+      ],
+      "adv": [
+        "Flanax®  deve ser utilizado na dose recomendada pelo menor tempo necessário para controlar os sintomas. Não é recomendado o uso de Flanax®  por mais de 10 dias consecutivos, a não ser sob orientação médica. Se a dor ou a febre persistirem ou se os sintomas mudarem, o médico deverá ser consultado.",
+        "Se os sintomas persistirem, consulte o seu médico.",
+        "Mantenha fora do alcance das crianças.",
+        "Notifique a suspeita de reação adversa para o e-mail: sac@bayer.com ou entre em contato com o nosso Serviço de Atendimento ao Consumidor pelo telefone 0800 723 1010"
+      ],
+      "reacoes": [
+        "Azia, náuseas, cólicas, dores de estômago e de barriga, dores de cabeça, inchaço dos pés e das mãos, zumbidos nos ouvidos, vertigens e tonturas. Se isso acontecer, pare o medicamento imediatamente e consulte o seu médico."
+      ]
+    },
+    "xr": {
+      "indicacao": [
+        "Promove o alívio da dor aguda que tenha um componente inflamatório, como dor de garganta; uso analgésico e antipirético em adultos, como dor de cabeça, dor abdominal e pélvica e dor de dente; lombalgia, dor nas pernas, tendinite, torcicolo, bursite, artralgia, cotovelo de tenista e dor reumática; condições pós-trauma, como entorses, distensões, contusões e lesões leves decorrentes de prática esportiva."
+      ],
+      "posologia": [
+        "Adultos e crianças com idade acima de 12 anos: tomar 1 comprimido a cada 24 horas enquanto durar os sintomas. A dose diária (24 horas) de 1 comprimido não deve ser excedida. Os efeitos indesejáveis podem ser diminuídos tomando-se a menor dose eficaz pelo menor tempo necessário para controlar os sintomas. Não se deve usar Flanax® XR (naproxeno sódico) por mais de 10 dias consecutivos, exceto sob orientação médica. Se a dor ou a febre persistirem ou se os sintomas mudarem, o médico deverá ser consultado. Indicado para o tratamento de dor e febre em adultos, sintomas de gripe e resfriado; dores musculares e articulares; dor após traumas: entorses, distensões, contusões, lesões leves decorrentes de prática esportiva."
+      ],
+      "contra": [
+        "Gravidez, durante amamentação",
+        "Alergia a naproxeno ou naproxeno sódico",
+        "Ser paciente sensível ou alérgico ao ácido acetilsalicílico ou outros medicamentos anti-inflamatórios e analgésicos",
+        "Apresentar úlcera péptica ativa, sangramento gastrointestinal; ou com um histórico dessas condições",
+        "Tem insuficiência cardíaca grave, insuficiência renal e / ou hepática.",
+        "Reações alérgicas decorrentes da ingestão de anti-inflamatórios não esteroidais."
+      ],
+      "adv": [
+        "Dor de origem gastrintestinal",
+        "Os efeitos adversos podem ser minimizados utilizando-se a dose eficaz mais baixa pelo menor tempo necessário para controle dos sintomas.",
+        "Não se deve usar Flanax® XR (naproxeno sódico) por mais de 10 dias consecutivos, exceto sob orientação médica.",
+        "Se os sintomas persistirem, consulte o seu médico.",
+        "Mantenha fora do alcance das crianças.",
+        "Notifique a suspeita de reação adversa para o e-mail: sac@bayer.com ou entre em contato com o nosso Serviço de Atendimento ao Consumidor pelo telefone 0800 723 1010"
+      ],
+      "reacoes": [
+        "Azia, náuseas, cólicas, dores de estômago e de barriga, dores de cabeça, inchaço dos pés e das mãos, zumbidos nos ouvidos, vertigens e tonturas. Se isso acontecer, pare o medicamento imediatamente e consulte o seu médico."
+      ]
+    }
   };
 
   const FAQ = [

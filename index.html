@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Roboto+Condensed:wght@100..900&family=Barlow:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700;1,800;1,900&family=Barlow+Condensed:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="stylesheet" href="styles.css?v=12" />
   <script>
     try { const t = localStorage.getItem('fx-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
     document.documentElement.classList.add('js');
@@ -151,7 +151,7 @@
           </header>
           <div class="bula__tabs" id="bulaTabs" role="tablist" aria-label="Seções da bula"></div>
           <div class="bula__body" id="bulaBody" aria-live="polite"></div>
-          <p class="bula__note">Resumo conforme o site oficial do Flanax e a bula aprovada pela Anvisa. Não substitui a leitura da bula completa nem a orientação de médico ou farmacêutico.</p>
+          <p class="bula__note">Conforme o site oficial do Flanax e a bula. Notifique suspeita de reação adversa: sac@bayer.com ou SAC 0800 723 1010. Em caso de superdose, ligue 0800 722 6001.</p>
         </div>
       </div>
       <div class="wrap section section--tight">
@@ -274,12 +274,12 @@
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="catalog.js?v=11"></script>
+  <script src="catalog.js?v=12"></script>
   <script>window.FX3D = new Promise(r => { window.__fx3d = r; setTimeout(() => r(null), 12000); });</script>
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
   <script type="module">
     try {
-      const m = await import("./scene3d.js?v=11");
+      const m = await import("./scene3d.js?v=12");
       window.__fx3d(await m.create({ lite: document.documentElement.classList.contains('lite') }));
     } catch (e) { console.warn('WebGL indisponível', e); window.__fx3d(null); }
   </script>
