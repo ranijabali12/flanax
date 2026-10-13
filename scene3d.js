@@ -71,11 +71,41 @@ function contactShadow(w, d) {
   m.rotation.x = -Math.PI / 2; m.renderOrder = -1; return m;
 }
 
+// Frente: a foto da embalagem. Laterais, topo e base esticam a última coluna/linha
+// de pixels de cada borda, para continuar exatamente a arte da frente.
+async function loadPhoto(url) {
+  const img = new Image(); img.src = url;
+  try { await img.decode(); } catch (e) { await new Promise(r => { img.onload = r; img.onerror = r; }); }
+  const cv = document.createElement('canvas'); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+  cv.getContext('2d').drawImage(img, 0, 0);
+  return cv;
+}
+function edgeCanvas(photo, edge) {
+  const W = photo.width, H = photo.height, cv = document.createElement('canvas');
+  const vertical = edge === 'left' || edge === 'right';
+  cv.width = vertical ? 64 : W; cv.height = vertical ? H : 64;
+  const x = cv.getContext('2d');
+  if (edge === 'right') x.drawImage(photo, W - 3, 0, 2, H, 0, 0, 64, H);
+  if (edge === 'left') x.drawImage(photo, 1, 0, 2, H, 0, 0, 64, H);
+  if (edge === 'top') x.drawImage(photo, 0, 1, W, 2, 0, 0, W, 64);
+  if (edge === 'bottom') x.drawImage(photo, 0, H - 3, W, 2, 0, 0, W, 64);
+  // leve sombreamento nas faces que não encaram a luz
+  x.fillStyle = edge === 'right' ? 'rgba(0,10,40,.18)' : edge === 'bottom' ? 'rgba(0,10,40,.3)' : edge === 'top' ? 'rgba(255,255,255,.06)' : 'rgba(0,10,40,.08)';
+  x.fillRect(0, 0, cv.width, cv.height);
+  return cv;
+}
+function labelSide(cv, label) {
+  const x = cv.getContext('2d');
+  x.save(); x.translate(cv.width / 2, cv.height * .93); x.rotate(-Math.PI / 2);
+  x.font = `italic 900 ${Math.round(cv.width * .42)}px Barlow, "Arial Black", sans-serif`;
+  x.textBaseline = 'middle'; x.fillStyle = '#FFD200'; x.fillText(label, 0, 0); x.restore();
+  return cv;
+}
 async function buildProduct(s, renderer, idx) {
   const { w, h, d } = s.box;
-  const [front, back] = await Promise.all([svgToCanvas(s.front(), 1100, Math.round(s.vb * 1.1)), svgToCanvas(s.back(), 700, Math.round(s.vb * .7))]);
+  const [front, back] = await Promise.all([loadPhoto(s.photo), svgToCanvas(s.back(), 700, Math.round(700 / s.ratio))]);
   const mat = (cv, rough = .45) => new THREE.MeshStandardMaterial({ map: tex(cv, renderer), roughness: rough, metalness: 0, envMapIntensity: .55 });
-  const mats = [mat(stopsCanvas(s.sides.right, s.sideLabel)), mat(stopsCanvas(s.sides.left)), mat(gradCanvas(s.top[0], s.top[1])), mat(gradCanvas(s.bottom, s.bottom)), mat(front, .32), mat(back)];
+  const mats = [mat(labelSide(edgeCanvas(front, 'right'), s.sideLabel)), mat(edgeCanvas(front, 'left')), mat(edgeCanvas(front, 'top')), mat(edgeCanvas(front, 'bottom')), mat(front, .32), mat(back)];
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats);
   const outer = new THREE.Group(), pose = new THREE.Group();
   pose.add(mesh); outer.add(pose);

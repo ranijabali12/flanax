@@ -177,7 +177,12 @@ window.FX = (() => {
       box: { w: 320, h: 237, d: 62 }, equiv: 'Dupla camada: 264 mg de liberação imediata + 396 mg de liberação prolongada', extra: 'Comprimido revestido azul, redondo' }
   ];
 
+  // Frente = a própria arte da embalagem (foto endireitada), proporção real de cada caixa
+  const PHOTO_RATIO = { 'flanax-275-8': 1.314, 'flanax-275-20': 1.298, 'flanax-550-10': 1.32, 'flanax-550-15': 1.276, 'flanax-xr': 1.359 };
   SKUS.forEach(s => {
+    s.photo = `assets/frentes/${s.id}.webp`;
+    s.ratio = PHOTO_RATIO[s.id];
+    s.box.h = Math.round(s.box.w / s.ratio);
     s.ativo = 'Naproxeno sódico';
     s.formula = 'C₁₄H₁₃NaO₃';
     s.front = () => (s.line === 'xr' ? xrFront(s) : regularFront(s));
@@ -210,6 +215,6 @@ window.FX = (() => {
     ['Onde encontro a bula?', 'Dentro de cada embalagem e no Bulário Eletrônico da Anvisa, no site consultas.anvisa.gov.br.']
   ];
 
-  const flat = s => `<div class="flat" style="aspect-ratio:${1000 / s.vb}">${s.front()}</div>`;
+  const flat = s => `<div class="flat" style="aspect-ratio:${s.ratio}"><img src="${s.photo}" alt="Embalagem de ${s.name} ${s.dose}, ${s.qtyLabel}" loading="lazy" decoding="async" /></div>`;
   return { C, SKUS, LINES, FAQ, flat, bayerCross, byId: id => SKUS.find(s => s.id === id) };
 })();
