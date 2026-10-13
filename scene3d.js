@@ -146,6 +146,67 @@ function backFace(art) {
   x.drawImage(lg, (W - lw * .8) / 2, H * .36, lw * .8, lh * .8);
   return cv;
 }
+/* ---------- Laterais e verso VETORIAIS ----------
+   Lê as faixas de cor da borda da frente, transforma em blocos de cor
+   sólida (SVG) e desenha logotipo e textos em vetor. Nada de pixel esticado. */
+const hex = c => '#' + c.map(v => Math.min(255, Math.max(0, Math.round(v))).toString(16).padStart(2, '0')).join('');
+function segments(art, side) {
+  const p = profile(art, side, .002), N = p.length / 3, segs = [];
+  let st = 0, acc = [p[0], p[1], p[2]], n = 1;
+  const dist = (i, c) => Math.abs(p[i * 3] - c[0]) + Math.abs(p[i * 3 + 1] - c[1]) + Math.abs(p[i * 3 + 2] - c[2]);
+  for (let i = 1; i < N; i++) {
+    const c = [acc[0] / n, acc[1] / n, acc[2] / n];
+    if (dist(i, c) > 70) { segs.push({ a: st / N, b: i / N, c }); st = i; acc = [0, 0, 0]; n = 0; }
+    acc[0] += p[i * 3]; acc[1] += p[i * 3 + 1]; acc[2] += p[i * 3 + 2]; n++;
+  }
+  segs.push({ a: st / N, b: 1, c: [acc[0] / n, acc[1] / n, acc[2] / n] });
+  // funde faixas finas (< 3%) na vizinha maior
+  for (let k = 0; k < segs.length; k++) if (segs.length > 1 && segs[k].b - segs[k].a < .03) {
+    const j = k === 0 ? 1 : (k === segs.length - 1 ? k - 1 : (segs[k - 1].b - segs[k - 1].a > segs[k + 1].b - segs[k + 1].a ? k - 1 : k + 1));
+    segs[j].a = Math.min(segs[j].a, segs[k].a); segs[j].b = Math.max(segs[j].b, segs[k].b); segs.splice(k, 1); k = -1;
+  }
+  return segs.map(g => ({ ...g, hex: hex(g.c) }));
+}
+const shadeHex = (c, f) => hex(c.map(v => v * f));
+function sideSVG(segs, W, H, label, shade) {
+  let r = segs.map(g => `<rect x="0" y="${(g.a * H).toFixed(1)}" width="${W}" height="${((g.b - g.a) * H + 1).toFixed(1)}" fill="${shadeHex(g.c, shade)}"/>`).join('');
+  if (label) {
+    const fs = W * .3, L = H * .62;
+    r += `<text transform="translate(${W * .62} ${H * .93}) rotate(-90)" font-family="Archivo, 'Arial Black', sans-serif" font-style="italic" font-weight="900" font-size="${fs}" textLength="${L}" lengthAdjust="spacingAndGlyphs" fill="#FFD200" stroke="#0B1F5C" stroke-width="${fs * .1}" paint-order="stroke" stroke-linejoin="round">${label}</text>`;
+    r += bayerSVG(W / 2, H * .14, W * .22);
+  }
+  return `<svg class="art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${r}</svg>`;
+}
+function bayerSVG(cx, cy, r) {
+  const fs = r * .37; let t = '';
+  [...'BAYER'].forEach((ch, i) => { const o = (i - 2) * fs; t += `<text x="${cx}" y="${cy + o + fs * .36}" text-anchor="middle">${ch}</text>`; if (i !== 2) t += `<text x="${cx + o}" y="${cy + fs * .36}" text-anchor="middle">${ch}</text>`; });
+  return `<g fill="#FFFFFF" font-family="Archivo, Arial, sans-serif" font-weight="800" font-size="${fs}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#FFFFFF" stroke-width="${r * .085}"/>${t}</g>`;
+}
+// Verso: blocos que começam com as cores da lateral direita e terminam com as da esquerda
+function backSVG(L, R, W, H, s) {
+  const cuts = [...new Set([0, 1, ...L.map(g => g.a), ...R.map(g => g.a)])].sort((a, b) => a - b);
+  const at = (segs, y) => (segs.find(g => y >= g.a && y < g.b) || segs[segs.length - 1]).hex;
+  let defs = '', body = '';
+  cuts.slice(0, -1).forEach((a, i) => {
+    const b = cuts[i + 1], m = (a + b) / 2, id = 'g' + i;
+    defs += `<linearGradient id="${id}" x1="0" x2="1"><stop offset=".08" stop-color="${at(R, m)}"/><stop offset=".92" stop-color="${at(L, m)}"/></linearGradient>`;
+    body += `<rect x="0" y="${(a * H).toFixed(1)}" width="${W}" height="${((b - a) * H + 1).toFixed(1)}" fill="url(#${id})"/>`;
+  });
+  const cx = W / 2, ly = H * .5, fs = H * .2, lw = W * .66;
+  const logo = (fill, dx, dy, extra = '') => `<text x="${cx + dx}" y="${ly + dy}" text-anchor="middle" font-family="Archivo, 'Arial Black', sans-serif" font-style="italic" font-weight="900" style="font-stretch:125%" font-size="${fs}" textLength="${lw}" lengthAdjust="spacingAndGlyphs" fill="${fill}"${extra}>FLANAX</text>`;
+  let ext = ''; for (let i = 8; i >= 1; i--) ext += logo(i > 5 ? '#0B1F5C' : '#163A8E', -i * .6, i * .8);
+  const dose = s.line === 'xr' ? 'XR 660 mg' : `${s.doseNum} mg`;
+  return `<svg class="art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <defs>${defs}<linearGradient id="ly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFEE80"/><stop offset=".45" stop-color="#FFDA1F"/><stop offset="1" stop-color="#F5B800"/></linearGradient></defs>
+    ${body}
+    <ellipse cx="${cx}" cy="${H * .46}" rx="${W * .44}" ry="${H * .3}" fill="#0B2A86" opacity=".35"/>
+    ${ext}${logo('url(#ly)', 0, 0, ' stroke="#D99A00" stroke-width="3" paint-order="stroke"')}
+    <text x="${cx}" y="${ly + fs * .62}" text-anchor="middle" font-family="'Roboto Condensed', 'Arial Narrow', sans-serif" font-size="${fs * .42}" fill="#2DB8EE">naproxeno sódico ${dose}</text>
+    <text x="${cx}" y="${H * .88}" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="600" font-size="${fs * .17}" fill="#FFFFFF" opacity=".9">Leia a bula. Bayer S.A. · SAC 0800 723 1010</text>
+    ${bayerSVG(W * .9, H * .82, H * .07)}
+  </svg>`;
+}
+
 async function buildProduct(s, renderer, idx) {
   const { w, h, d } = s.box;
   // frente: foto aprimorada; laterais, topo, base e verso: arte vetorizada (cores limpas)
@@ -153,8 +214,16 @@ async function buildProduct(s, renderer, idx) {
   const dp = Math.round(lados.width * d / w);
   const mat = (cv, rough = .4) => new THREE.MeshStandardMaterial({ map: tex(cv, renderer), roughness: rough, metalness: 0, envMapIntensity: .5 });
   const shade = (cv, a) => { const x = cv.getContext('2d'); x.fillStyle = `rgba(6,19,74,${a})`; x.fillRect(0, 0, cv.width, cv.height); return cv; };
-  const mats = [mat(sideLabel(shade(edge(lados, 'right', dp), .14), s.sideLabel)), mat(shade(edge(lados, 'left', dp), .06)),
-    mat(topArt || edge(lados, 'top', dp)), mat(shade(edge(lados, 'bottom', dp), .25)), mat(art, .3), mat(backFace(lados))];
+  const segL = segments(art, 'left'), segR = segments(art, 'right'), segT = segments(art, 'top'), segB = segments(art, 'bottom');
+  const SH = 1600, SW = Math.round(SH * d / h), BW = Math.round(SH * w / h);
+  const [cR, cL, cB] = await Promise.all([
+    svgToCanvas(sideSVG(segR, SW, SH, s.sideLabel, .86), SW, SH),
+    svgToCanvas(sideSVG(segL, SW, SH, null, .94), SW, SH),
+    svgToCanvas(backSVG(segL, segR, BW, SH, s), BW, SH)
+  ]);
+  const capSVG = (segs, f) => `<svg class="art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 10" preserveAspectRatio="none">${segs.map(g => `<rect y="0" height="10" x="${g.a * 1000}" width="${(g.b - g.a) * 1000 + 1}" fill="${shadeHex(g.c, f)}"/>`).join('')}</svg>`;
+  const [cT, cBt] = await Promise.all([svgToCanvas(capSVG([{ a: 0, b: 1, c: segR[0].c }], 1.04), 1024, 64), svgToCanvas(capSVG(segB, .7), 1024, 64)]);
+  const mats = [mat(cR), mat(cL), mat(topArt || cT), mat(cBt), mat(art, .3), mat(cB)];
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats);
   const outer = new THREE.Group(), pose = new THREE.Group();
   pose.add(mesh); outer.add(pose);
