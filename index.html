@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Roboto+Condensed:wght@100..900&family=Barlow:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700;1,800;1,900&family=Barlow+Condensed:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=15" />
+  <link rel="stylesheet" href="styles.css?v=16" />
   <script>
     try { const t = localStorage.getItem('fx-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
     document.documentElement.classList.add('js');
@@ -26,8 +26,17 @@
 
   <header class="topbar">
     <a href="#inicio" class="brand" data-go="inicio" aria-label="Flanax, início">
+      <svg class="brand__bayer" viewBox="0 0 40 40" role="img" aria-label="Bayer">
+        <defs><linearGradient id="bayerRing" x1="0" y1="0" x2="1" y2="1"><stop offset=".3" stop-color="#00BCFF"/><stop offset=".7" stop-color="#89D329"/></linearGradient></defs>
+        <circle cx="20" cy="20" r="19.6" fill="#fff"/>
+        <circle cx="20" cy="20" r="17.6" fill="none" stroke="url(#bayerRing)" stroke-width="2"/>
+        <g class="brand__letters" font-family="Archivo, Arial, sans-serif" font-weight="700" font-size="6.6" text-anchor="middle">
+          <text x="20" y="9.4">B</text><text x="20" y="15.9">A</text><text x="20" y="22.4">Y</text><text x="20" y="28.9">E</text><text x="20" y="35.4">R</text>
+          <text x="7" y="22.4">B</text><text x="13.5" y="22.4">A</text><text x="26.5" y="22.4">E</text><text x="33" y="22.4">R</text>
+        </g>
+      </svg>
+      <i class="brand__sep" aria-hidden="true"></i>
       <span class="brand__word">FLANAX<sup>®</sup></span>
-      <span class="brand__by">Bayer</span>
     </a>
     <nav class="tabs" role="tablist" aria-label="Seções">
       <span class="tabs__pill" aria-hidden="true"></span>
@@ -274,12 +283,12 @@
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="catalog.js?v=15"></script>
+  <script src="catalog.js?v=16"></script>
   <script>window.FX3D = new Promise(r => { window.__fx3d = r; setTimeout(() => r(null), 12000); });</script>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
   <script type="module">
     try {
-      const m = await import("./scene3d.js?v=15");
+      const m = await import("./scene3d.js?v=16");
       window.__fx3d(await m.create({ lite: document.documentElement.classList.contains('lite') }));
     } catch (e) { console.warn('WebGL indisponível', e); window.__fx3d(null); }
   </script>
