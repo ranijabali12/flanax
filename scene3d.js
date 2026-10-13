@@ -82,7 +82,7 @@ async function loadArt(url) {
 function profile(art, side, soft = .004) {
   const W = art.width, H = art.height, x = art.getContext('2d');
   const v = side === 'left' || side === 'right', N = v ? H : W;
-  const inset = Math.round((v ? W : H) * .025), band = Math.max(4, Math.round((v ? W : H) * .012));
+  const inset = Math.round((v ? W : H) * (v ? .025 : .006)), band = Math.max(4, Math.round((v ? W : H) * .012));
   const d = v ? x.getImageData(side === 'left' ? inset : W - inset - band, 0, band, H).data
               : x.getImageData(0, side === 'top' ? inset : H - inset - band, W, band).data;
   const out = new Float32Array(N * 3);
@@ -149,12 +149,12 @@ function backFace(art) {
 async function buildProduct(s, renderer, idx) {
   const { w, h, d } = s.box;
   // frente: foto aprimorada; laterais, topo, base e verso: arte vetorizada (cores limpas)
-  const art = await loadArt(s.art), lados = art;
+  const [art, topArt] = await Promise.all([loadArt(s.art), s.topImg ? loadArt(s.topImg) : null]), lados = art;
   const dp = Math.round(lados.width * d / w);
   const mat = (cv, rough = .4) => new THREE.MeshStandardMaterial({ map: tex(cv, renderer), roughness: rough, metalness: 0, envMapIntensity: .5 });
   const shade = (cv, a) => { const x = cv.getContext('2d'); x.fillStyle = `rgba(6,19,74,${a})`; x.fillRect(0, 0, cv.width, cv.height); return cv; };
   const mats = [mat(sideLabel(shade(edge(lados, 'right', dp), .14), s.sideLabel)), mat(shade(edge(lados, 'left', dp), .06)),
-    mat(edge(lados, 'top', dp)), mat(shade(edge(lados, 'bottom', dp), .25)), mat(art, .3), mat(backFace(lados))];
+    mat(topArt || edge(lados, 'top', dp)), mat(shade(edge(lados, 'bottom', dp), .25)), mat(art, .3), mat(backFace(lados))];
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats);
   const outer = new THREE.Group(), pose = new THREE.Group();
   pose.add(mesh); outer.add(pose);
