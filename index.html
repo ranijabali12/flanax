@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Roboto+Condensed:wght@100..900&family=Barlow:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700;1,800;1,900&family=Barlow+Condensed:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=18b" />
+  <link rel="stylesheet" href="styles.css?v=20" />
   <script>
     try { const t = localStorage.getItem('fx-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
     document.documentElement.classList.add('js');
@@ -45,6 +45,7 @@
       <button class="tabs__btn is-active" role="tab" data-go="inicio" aria-selected="true">Início</button>
       <button class="tabs__btn" role="tab" data-go="produtos" aria-selected="false">Produtos</button>
       <button class="tabs__btn" role="tab" data-go="xr" aria-selected="false">Flanax XR <i class="dot" aria-hidden="true"></i></button>
+      <button class="tabs__btn" role="tab" data-go="historia" aria-selected="false">História</button>
       <button class="tabs__btn" role="tab" data-go="duvidas" aria-selected="false">Dúvidas</button>
     </nav>
     <div class="topbar__actions">
@@ -226,6 +227,32 @@
       </div>
     </section>
 
+    <!-- ================= HISTÓRIA ================= -->
+    <section class="view" id="view-historia" data-view="historia" role="tabpanel" aria-label="História">
+      <div class="wrap section section--first section--head-only">
+        <header class="section__head reveal">
+          <span class="eyebrow">Linha do tempo</span>
+          <h2 class="h2">Da Syntex ao Flanax XR.</h2>
+          <p class="section__sub">Arraste, role ou use as setas para conhecer a história do naproxeno.</p>
+        </header>
+      </div>
+      <div class="timeline" id="timeline">
+        <div class="timeline__rail wrap"><span id="timelineBar"></span><span class="timeline__year" id="timelineYear">1970</span></div>
+        <ol class="timeline__track" id="timelineTrack" tabindex="0" aria-label="Linha do tempo">
+          <li class="era" data-year="1970"><span class="era__year">1970</span><h3>A molécula ganha escala</h3><p>No laboratório Syntex, nos Estados Unidos, começa a produção industrial do naproxeno, um anti-inflamatório não esteroide.</p><span class="era__f">C₁₄H₁₄O₃</span></li>
+          <li class="era" data-year="1976"><span class="era__year">1976</span><h3>Chega às farmácias</h3><p>A Syntex lança o naproxeno como medicamento, inicialmente vendido com prescrição.</p></li>
+          <li class="era" data-year="1994"><span class="era__year">1994</span><h3>Sem receita</h3><p>O naproxeno sódico é aprovado nos Estados Unidos para venda sem prescrição. No mesmo ano, a Roche compra a Syntex.</p><span class="era__f">naproxeno sódico</span></li>
+          <li class="era" data-year="2005"><span class="era__year">2005</span><h3>Flanax na Bayer</h3><p>A Bayer conclui a compra da divisão de saúde do consumidor da Roche, e o Flanax passa a fazer parte do portfólio da Bayer.</p></li>
+          <li class="era era--hot" data-year="Hoje"><span class="era__year">Hoje</span><h3>275 mg e 550 mg</h3><p>Flanax em comprimidos revestidos de 275 mg e 550 mg, para dores e inflamação do dia a dia.</p><span class="era__f">C₁₄H₁₃NaO₃</span></li>
+          <li class="era era--hot" data-year="XR"><span class="era__year">XR</span><h3>Flanax XR 660 mg</h3><p>Comprimido de dupla camada: uma parte de liberação imediata e outra de liberação prolongada, em uma tomada a cada 24 horas.</p><span class="era__f">660 mg · dupla camada</span></li>
+        </ol>
+        <div class="timeline__nav wrap">
+          <button class="icon-btn icon-btn--line" id="tlPrev" aria-label="Voltar na linha do tempo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+          <button class="icon-btn icon-btn--line" id="tlNext" aria-label="Avançar na linha do tempo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+        </div>
+      </div>
+    </section>
+
     <!-- ================= DÚVIDAS ================= -->
     <section class="view" id="view-duvidas" data-view="duvidas" role="tabpanel" aria-label="Dúvidas">
       <div class="wrap section section--first">
@@ -276,6 +303,7 @@
           <a href="#inicio" data-go="inicio">Início</a>
           <a href="#produtos" data-go="produtos">Produtos</a>
           <a href="#xr" data-go="xr">Flanax XR</a>
+          <a href="#historia" data-go="historia">História</a>
           <a href="#duvidas" data-go="duvidas">Dúvidas</a>
         </nav>
       </div>
@@ -303,7 +331,7 @@
   <script src="catalog.js?v=17"></script>
   <script src="lojas.js?v=18"></script>
   <script>window.FX3D = new Promise(r => { window.__fx3d = r; setTimeout(() => r(null), 12000); });</script>
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=20"></script>
   <script type="module">
     try {
       const m = await import("./scene3d.js?v=17");

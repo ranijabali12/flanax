@@ -31,7 +31,7 @@
 
   /* ---------- Abas ---------- */
   const tabBtns = $$('.tabs__btn'), pill = $('.tabs__pill');
-  const order = ['inicio', 'produtos', 'xr', 'duvidas'];
+  const order = ['inicio', 'produtos', 'xr', 'historia', 'duvidas'];
   let current = 'inicio';
   function movePill() {
     const btn = $(`.tabs__btn[data-go="${current}"]`); if (!btn) return;
@@ -380,7 +380,7 @@
 
   /* ---------- Busca (Ctrl K) ---------- */
   const pal = $('#palette'), pin = $('#paletteInput'), plist = $('#paletteList');
-  const tabNames = { inicio: 'Início', produtos: 'Produtos', xr: 'Flanax XR · dupla camada', duvidas: 'Dúvidas e onde comprar' };
+  const tabNames = { inicio: 'Início', produtos: 'Produtos', xr: 'Flanax XR · dupla camada', historia: 'História do Flanax', duvidas: 'Dúvidas e onde comprar' };
   const index = [
     ...SKUS.map(s => ({ title: title(s), sub: s.qtyLabel, text: `${title(s)} ${s.qtyLabel} ${s.equiv} naproxeno ${s.qty}`, s, run: () => { selectSku(s.id, true); go('produtos', { hash: s.id }); } })),
     ...order.map(id => ({ title: tabNames[id], sub: 'Ir para a aba', text: tabNames[id], ic: 'aba', run: () => go(id) })),
@@ -407,12 +407,49 @@
   });
 
   /* ---------- Ciclo por aba ---------- */
+  /* ---------- Linha do tempo ---------- */
+  const track = $('#timelineTrack');
+  const bar = $('#timelineBar');
+  const eras = $$('.era', track);
+  const updateBar = () => {
+    const max = track.scrollWidth - track.clientWidth;
+    bar.style.transform = `scaleX(${max > 0 ? Math.max(.04, track.scrollLeft / max) : 1})`;
+    const left = track.getBoundingClientRect().left + parseFloat(getComputedStyle(track).paddingLeft);
+    const cur = eras.reduce((best, el) => Math.abs(el.getBoundingClientRect().left - left) < Math.abs(best.getBoundingClientRect().left - left) ? el : best, eras[0]);
+    $('#timelineYear').textContent = cur.dataset.year;
+  };
+  track.addEventListener('scroll', updateBar, { passive: true });
+  const eraStep = () => eras[0].offsetWidth + 16;
+  $('#tlPrev').addEventListener('click', () => track.scrollBy({ left: -eraStep(), behavior: reduced ? 'auto' : 'smooth' }));
+  $('#tlNext').addEventListener('click', () => track.scrollBy({ left: eraStep(), behavior: reduced ? 'auto' : 'smooth' }));
+  track.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); track.scrollBy({ left: eraStep(), behavior: 'smooth' }); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); track.scrollBy({ left: -eraStep(), behavior: 'smooth' }); }
+  });
+  let tDown = false, tsx = 0, tsl = 0;
+  track.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; tDown = true; tsx = e.clientX; tsl = track.scrollLeft; });
+  addEventListener('pointermove', e => {
+    if (!tDown) return;
+    const dx = e.clientX - tsx;
+    if (Math.abs(dx) > 4) track.classList.add('is-drag');
+    track.scrollLeft = tsl - dx;
+  });
+  addEventListener('pointerup', () => { if (!tDown) return; tDown = false; track.classList.remove('is-drag'); });
+  track.addEventListener('wheel', e => {
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    const max = track.scrollWidth - track.clientWidth;
+    if ((track.scrollLeft <= 0 && e.deltaY < 0) || (track.scrollLeft >= max - 1 && e.deltaY > 0)) return;
+    e.preventDefault();
+    track.scrollLeft += e.deltaY;
+  }, { passive: false });
+
   function onEnter(id) {
     cancelAnimationFrame(vRAF); vRAF = null;
     if (id === 'inicio') { if (!oRAF) oRAF = requestAnimationFrame(orbitFrame); if (!reduced && !pRAF) { sizeCanvas(); pRAF = requestAnimationFrame(particles); } autoT0 = performance.now(); }
     else { cancelAnimationFrame(oRAF); oRAF = null; cancelAnimationFrame(pRAF); pRAF = null; }
     if (id === 'produtos') vRAF = requestAnimationFrame(viewerLoop);
     if (id === 'xr') drawMol();
+    if (id === 'historia') requestAnimationFrame(updateBar);
     onScroll();
   }
 

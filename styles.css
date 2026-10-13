@@ -518,3 +518,28 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 2px 6px; border-radi
 .finder__buy:hover { transform: translateY(-2px); background: var(--buy-hover-bg); color: var(--buy-hover-ink); }
 @media (max-width: 1100px) { .finder__form { grid-template-columns: 1fr; } .finder__form .btn { width: 100%; } }
 .buylist { scroll-margin-top: 96px; }
+
+/* ---------- História ---------- */
+.section--head-only { padding-bottom: 0; }
+.timeline { padding-bottom: var(--s-10, 80px); }
+.timeline__rail { position: relative; margin-bottom: var(--s-4); height: 24px; display: flex; align-items: center; }
+.timeline__rail::before { content: ""; position: absolute; left: var(--gutter); right: var(--gutter); height: 1px; background: var(--line-2); }
+.timeline__rail > span:first-child { position: absolute; left: var(--gutter); right: var(--gutter); height: 3px; background: linear-gradient(90deg, var(--yellow), var(--royal)); transform-origin: 0 50%; transform: scaleX(0); border-radius: 2px; transition: transform var(--t-mid) var(--ease); }
+.timeline__year { position: absolute; right: var(--gutter); top: -28px; font-family: var(--f-mono); font-size: var(--t-12); color: var(--muted); font-variant-numeric: tabular-nums; }
+.timeline__track { --edge: max(var(--gutter), calc((100vw - var(--wrap)) / 2 + var(--gutter))); list-style: none; margin: 0; display: flex; gap: var(--s-2); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--edge); padding: var(--s-2) var(--edge) var(--s-3); scrollbar-width: none; cursor: grab; }
+.timeline__track::-webkit-scrollbar { display: none; }
+.timeline__track.is-drag { cursor: grabbing; scroll-snap-type: none; }
+.era { flex: 0 0 320px; scroll-snap-align: start; display: grid; align-content: start; gap: var(--s-2); min-height: 360px; padding: var(--s-4); border-radius: var(--r-3); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); user-select: none; transition: transform 300ms var(--ease); }
+.era:hover { transform: translateY(-8px); }
+.era__year { font-family: var(--f-logo); font-weight: 900; font-style: italic; font-size: var(--t-64); line-height: 1; margin-bottom: var(--s-4); color: var(--royal); font-variant-numeric: tabular-nums; }
+.era h3 { margin: 0; font-size: var(--t-20); }
+.era p { margin: 0; color: var(--muted); font-size: var(--t-14); }
+.era__f { margin-top: auto; font-family: var(--f-mono); font-size: var(--t-12); color: var(--royal); }
+.era--hot { background: linear-gradient(160deg, var(--royal), var(--royal-2)); color: #fff; box-shadow: none; }
+.era--hot .era__year { color: var(--yellow); text-shadow: -2px 2px 0 rgba(11, 31, 92, .6); }
+.era--hot p { color: rgba(255, 255, 255, .82); }
+.era--hot .era__f { color: var(--yellow); }
+:root[data-theme="dark"] .era__year:not(.era--hot *), :root[data-theme="dark"] .era__f { color: var(--yellow); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .era__year, :root:not([data-theme="light"]) .era__f { color: var(--yellow); } }
+.timeline__nav { display: flex; gap: var(--s-1); justify-content: flex-end; }
+@media (max-width: 640px) { .era { flex-basis: 272px; min-height: 320px; padding: var(--s-3); } .era__year { font-size: var(--t-48); } }
