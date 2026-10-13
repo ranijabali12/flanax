@@ -77,15 +77,40 @@ async function loadArt(url) {
   cv.getContext('2d').drawImage(img, 0, 0);
   return cv;
 }
-// Laterais/topo/base: a última faixa de cada borda da arte, esticada → continuidade exata
-function edge(art, side, depthPx) {
-  const W = art.width, H = art.height, v = side === 'left' || side === 'right';
-  const cv = document.createElement('canvas'); cv.width = v ? depthPx : W; cv.height = v ? H : depthPx;
-  const x = cv.getContext('2d');
-  if (side === 'right') x.drawImage(art, W - 4, 0, 3, H, 0, 0, depthPx, H);
-  if (side === 'left') x.drawImage(art, 1, 0, 3, H, 0, 0, depthPx, H);
-  if (side === 'top') x.drawImage(art, 0, 1, W, 3, 0, 0, W, depthPx);
-  if (side === 'bottom') x.drawImage(art, 0, H - 4, W, 3, 0, 0, W, depthPx);
+// Laterais/topo/base: perfil de cores lido 2,5% para dentro de cada borda (evita o
+// contorno branco da foto), suavizado e esticado → continuidade com a frente
+function profile(art, side, soft = .004) {
+  const W = art.width, H = art.height, x = art.getContext('2d');
+  const v = side === 'left' || side === 'right', N = v ? H : W;
+  const inset = Math.round((v ? W : H) * .025), band = Math.max(4, Math.round((v ? W : H) * .012));
+  const d = v ? x.getImageData(side === 'left' ? inset : W - inset - band, 0, band, H).data
+              : x.getImageData(0, side === 'top' ? inset : H - inset - band, W, band).data;
+  const out = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    let r = 0, g = 0, b = 0;
+    for (let k = 0; k < band; k++) { const o = v ? (i * band + k) * 4 : (k * W + i) * 4; r += d[o]; g += d[o + 1]; b += d[o + 2]; }
+    out[i * 3] = r / band; out[i * 3 + 1] = g / band; out[i * 3 + 2] = b / band;
+  }
+  // suavização (remove ruído de compressão)
+  const R = Math.max(2, Math.round(N * soft)), sm = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) for (let c = 0; c < 3; c++) {
+    let t = 0, n = 0; for (let k = -R; k <= R; k++) { const j = Math.min(N - 1, Math.max(0, i + k)); t += out[j * 3 + c]; n++; }
+    sm[i * 3 + c] = t / n;
+  }
+  // as pontas também ficam com o contorno: repete a cor de 3% para dentro
+  const e = Math.round(N * .03);
+  for (let i = 0; i < e; i++) for (let c = 0; c < 3; c++) { sm[i * 3 + c] = sm[e * 3 + c]; sm[(N - 1 - i) * 3 + c] = sm[(N - 1 - e) * 3 + c]; }
+  return sm;
+}
+function edge(art, side, depthPx, soft) {
+  const p = profile(art, side, soft), v = side === 'left' || side === 'right', N = p.length / 3;
+  const cv = document.createElement('canvas'); cv.width = v ? depthPx : N; cv.height = v ? N : depthPx;
+  const x = cv.getContext('2d'), img = x.createImageData(cv.width, cv.height);
+  for (let yy = 0; yy < cv.height; yy++) for (let xx = 0; xx < cv.width; xx++) {
+    const i = v ? yy : xx, o = (yy * cv.width + xx) * 4;
+    img.data[o] = p[i * 3]; img.data[o + 1] = p[i * 3 + 1]; img.data[o + 2] = p[i * 3 + 2]; img.data[o + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
   return cv;
 }
 function sideLabel(cv, label) {
@@ -96,28 +121,40 @@ function sideLabel(cv, label) {
   x.fillStyle = '#FFD200'; x.fillText(label, 0, 0); x.restore();
   return cv;
 }
-// Verso: emenda nas duas laterais (bordas esticadas) com o logotipo da própria arte no centro
+// Verso: cada metade continua a lateral vizinha; no meio as duas se fundem.
+// Logotipo FLANAX recortado da frente com bordas suaves.
 function backFace(art) {
   const W = art.width, H = art.height, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const x = cv.getContext('2d');
-  x.drawImage(art, 1, 0, 3, H, W / 2, 0, W / 2, H);     // metade direita do verso encosta na lateral esquerda
-  x.drawImage(art, W - 4, 0, 3, H, 0, 0, W / 2, H);     // metade esquerda encosta na lateral direita
-  const g = x.createLinearGradient(W * .3, 0, W * .7, 0);
-  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.5, 'rgba(10,30,110,.35)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-  x.fillStyle = g; x.fillRect(0, 0, W, H);
-  // logotipo FLANAX recortado da frente
-  const ly = H * .14, lh = H * .3;
-  x.drawImage(art, W * .06, ly, W * .9, lh, W * .12, H * .32, W * .76, lh * .76 / .9);
+  const L = edge(art, 'left', 8, .025), Rt = edge(art, 'right', 8, .025);
+  x.drawImage(Rt, 0, 0, 8, H, 0, 0, W, H);                         // começa encostado na lateral direita
+  const m = document.createElement('canvas'); m.width = W; m.height = H;
+  const mx = m.getContext('2d'); mx.drawImage(L, 0, 0, 8, H, 0, 0, W, H);
+  mx.globalCompositeOperation = 'destination-in';
+  const g = mx.createLinearGradient(W * .25, 0, W * .75, 0); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,1)');
+  mx.fillStyle = g; mx.fillRect(0, 0, W, H);
+  x.drawImage(m, 0, 0);                                             // termina encostado na lateral esquerda
+  // logotipo com máscara elíptica suave
+  const lw = W * .9, lh = H * .27, sx = W * .05, sy = H * .15;
+  const lg = document.createElement('canvas'); lg.width = lw; lg.height = lh;
+  const lx = lg.getContext('2d'); lx.drawImage(art, sx, sy, lw, lh, 0, 0, lw, lh);
+  lx.globalCompositeOperation = 'destination-in';
+  const gx = lx.createLinearGradient(0, 0, lw, 0); gx.addColorStop(0, 'rgba(0,0,0,0)'); gx.addColorStop(.05, '#000'); gx.addColorStop(.95, '#000'); gx.addColorStop(1, 'rgba(0,0,0,0)');
+  lx.fillStyle = gx; lx.fillRect(0, 0, lw, lh);
+  const gy = lx.createLinearGradient(0, 0, 0, lh); gy.addColorStop(0, 'rgba(0,0,0,0)'); gy.addColorStop(.14, '#000'); gy.addColorStop(.86, '#000'); gy.addColorStop(1, 'rgba(0,0,0,0)');
+  lx.fillStyle = gy; lx.fillRect(0, 0, lw, lh);
+  x.drawImage(lg, (W - lw * .8) / 2, H * .36, lw * .8, lh * .8);
   return cv;
 }
 async function buildProduct(s, renderer, idx) {
   const { w, h, d } = s.box;
-  const art = await loadArt(s.art);
-  const dp = Math.round(art.width * d / w);
+  // frente: foto aprimorada; laterais, topo, base e verso: arte vetorizada (cores limpas)
+  const art = await loadArt(s.art), lados = art;
+  const dp = Math.round(lados.width * d / w);
   const mat = (cv, rough = .4) => new THREE.MeshStandardMaterial({ map: tex(cv, renderer), roughness: rough, metalness: 0, envMapIntensity: .5 });
   const shade = (cv, a) => { const x = cv.getContext('2d'); x.fillStyle = `rgba(6,19,74,${a})`; x.fillRect(0, 0, cv.width, cv.height); return cv; };
-  const mats = [mat(sideLabel(shade(edge(art, 'right', dp), .14), s.sideLabel)), mat(shade(edge(art, 'left', dp), .06)),
-    mat(edge(art, 'top', dp)), mat(shade(edge(art, 'bottom', dp), .25)), mat(art, .3), mat(backFace(art))];
+  const mats = [mat(sideLabel(shade(edge(lados, 'right', dp), .14), s.sideLabel)), mat(shade(edge(lados, 'left', dp), .06)),
+    mat(edge(lados, 'top', dp)), mat(shade(edge(lados, 'bottom', dp), .25)), mat(art, .3), mat(backFace(lados))];
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats);
   const outer = new THREE.Group(), pose = new THREE.Group();
   pose.add(mesh); outer.add(pose);
