@@ -179,8 +179,8 @@ window.FX = (() => {
 
   // Frente = a própria arte da embalagem (foto endireitada), proporção real de cada caixa
   const PHOTO_RATIO = { 'flanax-275-8': 1.314, 'flanax-275-20': 1.298, 'flanax-550-10': 1.32, 'flanax-550-15': 1.276, 'flanax-xr': 1.359 };
-  // Arte vetorizada da embalagem (traçado da foto), renderizada em alta resolução
-  const ART_RATIO = { 'flanax-275-8': 1.3111, 'flanax-275-20': 1.2995, 'flanax-550-10': 1.3204, 'flanax-550-15': 1.28, 'flanax-xr': 1.359 };
+  // Arte da embalagem: as fotos originais, sem tratamento
+  const ART_RATIO = { 'flanax-275-8': 1.3115, 'flanax-275-20': 1.2998, 'flanax-550-10': 1.3201, 'flanax-550-15': 1.28, 'flanax-xr': 1.3594 };
   SKUS.forEach(s => {
     s.art = `assets/arte/${s.id}.webp`;
     s.ratio = ART_RATIO[s.id];

@@ -13,7 +13,7 @@ Site conceitual da linha Flanax (naproxeno sódico), com as cinco embalagens em 
 Site estático, sem build: sirva a pasta (`python3 -m http.server`) e abra `index.html`.
 
 ## Arquivos
-- `assets/arte`: arte das cinco embalagens vetorizada por traçado das fotos e renderizada em 2048 px. Laterais, topo, base e verso continuam as bordas dessa arte.
+- `assets/arte`: as fotos originais das cinco embalagens, recortadas e sem tratamento. Laterais, topo, base e verso continuam as bordas dessa arte.
 - `catalog.js`: dados dos produtos.
 - `scene3d.js`: caixas em WebGL (three.js, em `assets/vendor`), com as artes como textura.
 - `app.js`: interações (abas, órbita, visualizador, busca Ctrl K, tema).
