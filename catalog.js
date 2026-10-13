@@ -182,7 +182,7 @@ window.FX = (() => {
   // Arte da embalagem: as fotos originais, sem tratamento
   const ART_RATIO = { 'flanax-275-8': 1.3115, 'flanax-275-20': 1.2998, 'flanax-550-10': 1.3201, 'flanax-550-15': 1.28, 'flanax-xr': 1.3594 };
   SKUS.forEach(s => {
-    s.art = `assets/arte/${s.id}.webp`;
+    s.art = `assets/arte/${s.id}-original.webp`;
     s.ratio = ART_RATIO[s.id];
     s.box.h = Math.round(s.box.w / s.ratio);
     s.ativo = 'Naproxeno sódico';
