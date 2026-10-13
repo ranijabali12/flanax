@@ -2,6 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Flanax · Bayer</title>
   <meta name="description" content="Flanax naproxeno sódico 275 mg e 550 mg e o Flanax XR 660 mg de dupla camada. As cinco embalagens em 3D." />
@@ -15,11 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Roboto+Condensed:wght@100..900&family=Barlow:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700;1,800;1,900&family=Barlow+Condensed:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20" />
-  <script>
-    try { const t = localStorage.getItem('fx-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-    document.documentElement.classList.add('js');
-  </script>
+  <link rel="stylesheet" href="styles.css?v=30" />
+  <script src="boot.js?v=30"></script>
 </head>
 <body>
   <a class="skip" href="#app">Pular para o conteúdo</a>
@@ -328,15 +327,9 @@
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="catalog.js?v=17"></script>
-  <script src="lojas.js?v=18"></script>
-  <script>window.FX3D = new Promise(r => { window.__fx3d = r; setTimeout(() => r(null), 12000); });</script>
-  <script src="app.js?v=20"></script>
-  <script type="module">
-    try {
-      const m = await import("./scene3d.js?v=17");
-      window.__fx3d(await m.create({ lite: document.documentElement.classList.contains('lite') }));
-    } catch (e) { console.warn('WebGL indisponível', e); window.__fx3d(null); }
-  </script>
+  <script src="catalog.js?v=30"></script>
+  <script src="lojas.js?v=30"></script>
+  <script src="app.js?v=30"></script>
+  <script type="module" src="boot3d.js?v=30"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 (() => {
   const { SKUS, LINES, FAQ, BULA, flat, byId } = window.FX;
   const $ = (s, el = document) => el.querySelector(s);
+  const escHTML = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(pointer: fine)').matches;
@@ -87,9 +88,9 @@
   }
   function runCounter(el) {
     if (el.dataset.done) return; el.dataset.done = 1;
-    const target = +el.dataset.count; if (reduced) { el.textContent = target; return; }
+    const target = +el.dataset.count; if (reduced || target > 1000) { el.textContent = target; return; }
     const t0 = performance.now();
-    const tick = now => { const p = Math.min((now - t0) / 1100, 1), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; el.textContent = Math.round(target * e); if (p < 1) requestAnimationFrame(tick); };
+    const tick = now => { const p = Math.min((now - t0) / 800, 1), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; el.textContent = Math.round(target * e); if (p < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   }
 
@@ -357,7 +358,7 @@
     const d = cep.value.replace(/\D/g, '');
     if (d.length !== 8) { msg.textContent = 'Digite o CEP com 8 números, por exemplo 01310-100.'; cep.focus(); return; }
     const url = `https://www.google.com/maps/search/farm%C3%A1cia+${d}`;
-    msg.innerHTML = `Farmácias perto de ${cep.value}: <a href="${url}" target="_blank" rel="noopener">abrir no mapa ↗</a>`;
+    msg.innerHTML = `Farmácias perto de ${d.slice(0, 5)}-${d.slice(5)}: <a href="${url}" target="_blank" rel="noopener">abrir no mapa ↗</a>`;
     window.open(url, '_blank', 'noopener');
   });
 
@@ -391,7 +392,7 @@
     const q = norm(pin.value.trim());
     results = q ? index.filter(it => q.split(/\s+/).every(w => norm(it.text).includes(w))) : index.slice(0, 9); sel = 0;
     plist.innerHTML = results.length ? results.slice(0, 12).map((it, i) => `<li class="palette__item${i ? '' : ' is-sel'}" role="option" data-i="${i}" aria-selected="${!i}">${it.s ? flat(it.s) : `<span class="palette__ic">${it.ic}</span>`}<div><b>${it.title}</b><span>${it.sub}</span></div><kbd>Enter</kbd></li>`).join('')
-      : `<li class="palette__empty">Nada encontrado para “${pin.value}”. Tente “XR”, “550” ou “20”.</li>`;
+      : `<li class="palette__empty">Nada encontrado para “${escHTML(pin.value)}”. Tente “XR”, “550” ou “20”.</li>`;
   }
   function moveSel(d) { const els = $$('.palette__item', plist); if (!els.length) return; sel = (sel + d + els.length) % els.length; els.forEach((el, i) => { el.classList.toggle('is-sel', i === sel); el.setAttribute('aria-selected', i === sel); }); els[sel].scrollIntoView({ block: 'nearest' }); }
   const openPal = () => { if (pal.open) return; pin.value = ''; renderPal(); pal.showModal(); pin.focus(); };
