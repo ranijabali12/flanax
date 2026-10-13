@@ -207,6 +207,21 @@ window.FX = (() => {
     xr: { key: 'xr', name: 'Flanax XR', lead: 'Naproxeno sódico 660 mg em comprimido de dupla camada: uma parte de liberação imediata e outra de liberação prolongada.' }
   };
 
+  // Informações de bula (conforme flanax.com.br e bula Anvisa). Texto resumido; não substitui a bula.
+  const BULA_BASE = {
+    indicacoes: ['Alívio de dores agudas com componente inflamatório: dor no corpo, nas costas, nas pernas, na coluna e dor ciática', 'Dor de garganta, de dente, abdominal e pélvica, e dor de cabeça', 'Dores musculares e nas articulações, e dor após traumas leves (entorses, distensões)', 'Dor e febre em adultos, inclusive sintomas de gripe e resfriado'],
+    contra: ['Alergia ao naproxeno ou a qualquer componente da fórmula', 'Histórico de asma, urticária ou outras reações alérgicas provocadas pelo ácido acetilsalicílico ou por outros anti-inflamatórios (AINEs)', 'Histórico de sangramento ou perfuração gastrointestinal relacionado a AINEs, ou úlcera péptica ativa ou recorrente', 'Insuficiência cardíaca grave', 'Suspeita de dengue, pelo risco de sangramento', 'Gravidez: usar somente sob orientação médica'],
+    adv: ['Use a menor dose eficaz pelo menor tempo necessário. Não use por mais de 10 dias seguidos sem orientação médica', 'Idosos e pessoas com histórico de úlcera têm maior risco de complicações gastrointestinais. Interrompa o uso em caso de sangramento ou úlcera', 'Reações graves de pele são raras, mas podem ocorrer, sobretudo no início do tratamento. Pare o uso ao primeiro sinal de erupção cutânea', 'Cuidado em pessoas com pressão alta ou insuficiência cardíaca: pode haver retenção de líquido e inchaço', 'Pessoas com problemas nos rins ou no fígado devem usar sob supervisão médica', 'Não use junto com outros anti-inflamatórios'],
+    reacoes: ['Comuns: tontura, dor de cabeça, náusea, azia e dor abdominal', 'Incomuns a raras: vômitos, inchaço (edema) e febre', 'Muito raras e graves: reação alérgica grave (anafilaxia), sangramento ou perfuração gastrointestinal e alterações no sangue', 'AINEs estão associados a pequeno aumento do risco de infarto e AVC']
+  };
+  const BULA = {
+    'flanax': { ...BULA_BASE, adv: [...BULA_BASE.adv, 'Contém sódio: 25 mg por comprimido de 275 mg e 50 mg por comprimido de 550 mg'] },
+    'xr': { ...BULA_BASE,
+      contra: [...BULA_BASE.contra, 'Não indicado para menores de 12 anos'],
+      adv: [...BULA_BASE.adv, 'Comprimido de liberação prolongada: engula inteiro, sem partir ou mastigar. Uso adulto'],
+      reacoes: [...BULA_BASE.reacoes, 'Também relatados: sonolência, vertigem e insônia'] }
+  };
+
   const FAQ = [
     ['Qual o princípio ativo do Flanax?', 'Naproxeno sódico. O comprimido de 275 mg equivale a 250 mg de naproxeno e o de 550 mg equivale a 500 mg.'],
     ['O que é o Flanax XR?', 'É a versão de liberação prolongada: cada comprimido de 660 mg tem duas camadas, uma de liberação imediata com 264 mg e outra de liberação prolongada com 396 mg de naproxeno sódico.'],
@@ -217,5 +232,5 @@ window.FX = (() => {
   ];
 
   const flat = s => `<div class="flat" style="aspect-ratio:${s.ratio}"><img src="${s.art}" alt="Embalagem de ${s.name} ${s.dose}, ${s.qtyLabel}" loading="lazy" decoding="async" /></div>`;
-  return { C, SKUS, LINES, FAQ, flat, bayerCross, byId: id => SKUS.find(s => s.id === id) };
+  return { C, SKUS, LINES, FAQ, BULA, flat, bayerCross, byId: id => SKUS.find(s => s.id === id) };
 })();

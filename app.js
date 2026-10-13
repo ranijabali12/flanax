@@ -1,6 +1,6 @@
 /* Flanax · interações */
 (() => {
-  const { SKUS, LINES, FAQ, flat, byId } = window.FX;
+  const { SKUS, LINES, FAQ, BULA, flat, byId } = window.FX;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -232,12 +232,21 @@
     if (s.line !== line) setLine(s.line, true);
     const changed = s !== sku; sku = s;
     $$('#skuList .sku').forEach(b => { const on = b.dataset.id === id; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on); });
-    const rows = [['Princípio ativo', s.ativo], ['Concentração', s.dose], ['Composição', s.equiv], ['Apresentação', s.qtyLabel], ['Detalhe', s.extra], ['Bula', 'Leia a bula antes de usar']];
+    const rows = [['Princípio ativo', s.ativo], ['Concentração', s.dose], ['Composição', s.equiv], ['Apresentação', s.qtyLabel], ['Detalhe', s.extra], ['Bula', 'Veja indicações e cuidados abaixo']];
     $('#sheet').innerHTML = `<div class="sheet__head"><span class="eyebrow">Ficha do produto</span><h3 class="sheet__name">${s.line === 'xr' ? 'Flanax <b>XR</b>' : 'Flanax'} ${s.dose}</h3><span class="sheet__formula">${s.formula}</span></div>
       <dl>${rows.map(([k, v], i) => `<div class="sheet__row" style="--i:${i}"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
+    renderBula(s);
     $('#viewerFallback').innerHTML = flat(s);
     if (GL && (changed || instant)) { GL.viewer.setProduct(s, instant || reduced); if (changed && !instant && !reduced) vy += 360; }
   }
+  let bulaTab = 'indicacoes';
+  function renderBula(s) {
+    const B = BULA[s.line], T = [['indicacoes', 'Indicações'], ['contra', 'Contraindicações'], ['adv', 'Advertências'], ['reacoes', 'Reações adversas']];
+    $('#bulaTitle').textContent = s.line === 'xr' ? 'Flanax XR 660 mg' : `Flanax ${s.dose}`;
+    $('#bulaTabs').innerHTML = T.map(([k, n]) => `<button class="bula__tab${k === bulaTab ? ' is-on' : ''}" role="tab" aria-selected="${k === bulaTab}" data-k="${k}">${n}</button>`).join('');
+    $('#bulaBody').innerHTML = `<ul class="bula__list">${B[bulaTab].map((t, i) => `<li style="--i:${i}">${t}</li>`).join('')}</ul>`;
+  }
+  $('#bulaTabs').addEventListener('click', e => { const b = e.target.closest('.bula__tab'); if (!b) return; bulaTab = b.dataset.k; renderBula(sku); });
   $$('.switch__btn').forEach(b => b.addEventListener('click', () => { setLine(b.dataset.line); history.replaceState(null, '', '#' + sku.id); }));
   const viewer = $('#viewer');
   let vx = -10, vy = -24, rvx = vx, rvy = vy, vDrag = false, vlx = 0, vly = 0, idle = 0, lock = 0, vRAF = null;
