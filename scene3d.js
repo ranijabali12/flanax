@@ -9,9 +9,8 @@ import { RoomEnvironment } from './assets/vendor/RoomEnvironment.js';
 const FX = window.FX;
 const DEG = Math.PI / 180;
 const FONT_FILES = [
-  ['Barlow', 'normal', 500, 'Barlow-500'], ['Barlow', 'normal', 600, 'Barlow-600'], ['Barlow', 'normal', 700, 'Barlow-700'], ['Barlow', 'normal', 800, 'Barlow-800'],
-  ['Barlow', 'italic', 600, 'Barlow-600i'], ['Barlow', 'italic', 700, 'Barlow-700i'], ['Barlow', 'italic', 800, 'Barlow-800i'], ['Barlow', 'italic', 900, 'Barlow-900i'],
-  ['Barlow Condensed', 'normal', 500, 'BarlowCondensed-500'], ['Barlow Condensed', 'normal', 600, 'BarlowCondensed-600'], ['Barlow Condensed', 'normal', 700, 'BarlowCondensed-700']
+  ['Archivo', 'normal', '100 900', 'Archivo-VF', '62% 125%'], ['Archivo', 'italic', '100 900', 'Archivo-VF-i', '62% 125%'],
+  ['Roboto Condensed', 'normal', '100 900', 'RobotoCondensed-VF', '100%'], ['Roboto Condensed', 'italic', '100 900', 'RobotoCondensed-VF-i', '100%']
 ];
 
 // SVG desenhado como imagem não enxerga as fontes da página: elas vão embutidas em base64
@@ -19,8 +18,8 @@ let fontCSS = null;
 async function loadFontCSS() {
   if (fontCSS !== null) return fontCSS;
   const b64 = buf => { let s = ''; const b = new Uint8Array(buf); for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
-  const faces = await Promise.all(FONT_FILES.map(async ([fam, style, w, file]) => {
-    try { const r = await fetch(`assets/fonts/${file}.woff2`); if (!r.ok) return ''; return `@font-face{font-family:'${fam}';font-style:${style};font-weight:${w};src:url(data:font/woff2;base64,${b64(await r.arrayBuffer())}) format('woff2');}`; } catch (e) { return ''; }
+  const faces = await Promise.all(FONT_FILES.map(async ([fam, style, w, file, st]) => {
+    try { const r = await fetch(`assets/fonts/${file}.woff2`); if (!r.ok) return ''; return `@font-face{font-family:'${fam}';font-style:${style};font-weight:${w};font-stretch:${st};src:url(data:font/woff2;base64,${b64(await r.arrayBuffer())}) format('woff2');}`; } catch (e) { return ''; }
   }));
   fontCSS = faces.join('');
   return fontCSS;
@@ -71,41 +70,54 @@ function contactShadow(w, d) {
   m.rotation.x = -Math.PI / 2; m.renderOrder = -1; return m;
 }
 
-// Frente: a foto da embalagem. Laterais, topo e base esticam a última coluna/linha
-// de pixels de cada borda, para continuar exatamente a arte da frente.
-async function loadPhoto(url) {
+async function loadArt(url) {
   const img = new Image(); img.src = url;
   try { await img.decode(); } catch (e) { await new Promise(r => { img.onload = r; img.onerror = r; }); }
   const cv = document.createElement('canvas'); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
   cv.getContext('2d').drawImage(img, 0, 0);
   return cv;
 }
-function edgeCanvas(photo, edge) {
-  const W = photo.width, H = photo.height, cv = document.createElement('canvas');
-  const vertical = edge === 'left' || edge === 'right';
-  cv.width = vertical ? 64 : W; cv.height = vertical ? H : 64;
+// Laterais/topo/base: a última faixa de cada borda da arte, esticada → continuidade exata
+function edge(art, side, depthPx) {
+  const W = art.width, H = art.height, v = side === 'left' || side === 'right';
+  const cv = document.createElement('canvas'); cv.width = v ? depthPx : W; cv.height = v ? H : depthPx;
   const x = cv.getContext('2d');
-  if (edge === 'right') x.drawImage(photo, W - 3, 0, 2, H, 0, 0, 64, H);
-  if (edge === 'left') x.drawImage(photo, 1, 0, 2, H, 0, 0, 64, H);
-  if (edge === 'top') x.drawImage(photo, 0, 1, W, 2, 0, 0, W, 64);
-  if (edge === 'bottom') x.drawImage(photo, 0, H - 3, W, 2, 0, 0, W, 64);
-  // leve sombreamento nas faces que não encaram a luz
-  x.fillStyle = edge === 'right' ? 'rgba(0,10,40,.18)' : edge === 'bottom' ? 'rgba(0,10,40,.3)' : edge === 'top' ? 'rgba(255,255,255,.06)' : 'rgba(0,10,40,.08)';
-  x.fillRect(0, 0, cv.width, cv.height);
+  if (side === 'right') x.drawImage(art, W - 4, 0, 3, H, 0, 0, depthPx, H);
+  if (side === 'left') x.drawImage(art, 1, 0, 3, H, 0, 0, depthPx, H);
+  if (side === 'top') x.drawImage(art, 0, 1, W, 3, 0, 0, W, depthPx);
+  if (side === 'bottom') x.drawImage(art, 0, H - 4, W, 3, 0, 0, W, depthPx);
   return cv;
 }
-function labelSide(cv, label) {
+function sideLabel(cv, label) {
+  const x = cv.getContext('2d'), fs = cv.width * .3;
+  x.save(); x.translate(cv.width * .62, cv.height * .94); x.rotate(-Math.PI / 2);
+  x.font = `italic 900 ${fs}px Archivo, "Arial Black", sans-serif`;
+  x.lineWidth = fs * .12; x.strokeStyle = '#0B1F5C'; x.strokeText(label, 0, 0);
+  x.fillStyle = '#FFD200'; x.fillText(label, 0, 0); x.restore();
+  return cv;
+}
+// Verso: emenda nas duas laterais (bordas esticadas) com o logotipo da própria arte no centro
+function backFace(art) {
+  const W = art.width, H = art.height, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const x = cv.getContext('2d');
-  x.save(); x.translate(cv.width / 2, cv.height * .93); x.rotate(-Math.PI / 2);
-  x.font = `italic 900 ${Math.round(cv.width * .42)}px Barlow, "Arial Black", sans-serif`;
-  x.textBaseline = 'middle'; x.fillStyle = '#FFD200'; x.fillText(label, 0, 0); x.restore();
+  x.drawImage(art, 1, 0, 3, H, W / 2, 0, W / 2, H);     // metade direita do verso encosta na lateral esquerda
+  x.drawImage(art, W - 4, 0, 3, H, 0, 0, W / 2, H);     // metade esquerda encosta na lateral direita
+  const g = x.createLinearGradient(W * .3, 0, W * .7, 0);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.5, 'rgba(10,30,110,.35)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  // logotipo FLANAX recortado da frente
+  const ly = H * .14, lh = H * .3;
+  x.drawImage(art, W * .06, ly, W * .9, lh, W * .12, H * .32, W * .76, lh * .76 / .9);
   return cv;
 }
 async function buildProduct(s, renderer, idx) {
   const { w, h, d } = s.box;
-  const [front, back] = await Promise.all([loadPhoto(s.photo), svgToCanvas(s.back(), 700, Math.round(700 / s.ratio))]);
-  const mat = (cv, rough = .45) => new THREE.MeshStandardMaterial({ map: tex(cv, renderer), roughness: rough, metalness: 0, envMapIntensity: .55 });
-  const mats = [mat(labelSide(edgeCanvas(front, 'right'), s.sideLabel)), mat(edgeCanvas(front, 'left')), mat(edgeCanvas(front, 'top')), mat(edgeCanvas(front, 'bottom')), mat(front, .32), mat(back)];
+  const art = await loadArt(s.art);
+  const dp = Math.round(art.width * d / w);
+  const mat = (cv, rough = .4) => new THREE.MeshStandardMaterial({ map: tex(cv, renderer), roughness: rough, metalness: 0, envMapIntensity: .5 });
+  const shade = (cv, a) => { const x = cv.getContext('2d'); x.fillStyle = `rgba(6,19,74,${a})`; x.fillRect(0, 0, cv.width, cv.height); return cv; };
+  const mats = [mat(sideLabel(shade(edge(art, 'right', dp), .14), s.sideLabel)), mat(shade(edge(art, 'left', dp), .06)),
+    mat(edge(art, 'top', dp)), mat(shade(edge(art, 'bottom', dp), .25)), mat(art, .3), mat(backFace(art))];
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats);
   const outer = new THREE.Group(), pose = new THREE.Group();
   pose.add(mesh); outer.add(pose);
