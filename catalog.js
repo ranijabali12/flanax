@@ -179,10 +179,10 @@ window.FX = (() => {
 
   // Frente = a própria arte da embalagem (foto endireitada), proporção real de cada caixa
   const PHOTO_RATIO = { 'flanax-275-8': 1.314, 'flanax-275-20': 1.298, 'flanax-550-10': 1.32, 'flanax-550-15': 1.276, 'flanax-xr': 1.359 };
-  // Arte da embalagem: as fotos originais, sem tratamento
-  const ART_RATIO = { 'flanax-275-8': 1.3115, 'flanax-275-20': 1.2998, 'flanax-550-10': 1.3201, 'flanax-550-15': 1.28, 'flanax-xr': 1.3594 };
+  // Arte da embalagem: as fotos originais, aprimoradas com super-resolução (Real-ESRGAN)
+  const ART_RATIO = { 'flanax-275-8': 1.312, 'flanax-275-20': 1.3, 'flanax-550-10': 1.3201, 'flanax-550-15': 1.2795, 'flanax-xr': 1.3596 };
   SKUS.forEach(s => {
-    s.art = `assets/arte/${s.id}-original.webp`;
+    s.art = `assets/arte/${s.id}-hd.webp`;
     s.ratio = ART_RATIO[s.id];
     s.box.h = Math.round(s.box.w / s.ratio);
     s.ativo = 'Naproxeno sódico';
