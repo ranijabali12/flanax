@@ -362,6 +362,7 @@
   });
 
   /* ---------- Farmácias perto de mim e compra on-line ---------- */
+  $('#buyBtn').addEventListener('click', e => { e.preventDefault(); $('#buyList').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); });
   $('#geoBtn').addEventListener('click', () => {
     const open = url => { msg.innerHTML = `Farmácias perto de você: <a href="${url}" target="_blank" rel="noopener">abrir no mapa ↗</a>`; window.open(url, '_blank', 'noopener'); };
     if (!navigator.geolocation) return open('https://www.google.com/maps/search/farm%C3%A1cia');

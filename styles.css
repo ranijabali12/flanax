@@ -506,3 +506,15 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 2px 6px; border-radi
 .buylist__name span { font-size: var(--t-12); color: var(--muted); }
 .buylist__note { margin: 0; font-size: var(--t-12); color: var(--muted); font-family: var(--f-mono); }
 @media (max-width: 720px) { .buylist { padding: var(--s-3); } .buylist__row { grid-template-columns: 1fr; gap: var(--s-1); } }
+
+/* Onde comprar: formulário quebra linha em vez de vazar; botão de compra on-line */
+.finder { min-width: 0; }
+.finder__form { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+.finder__form input { width: 100%; }
+.finder__actions { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.finder { --buy-ink: var(--royal-2); --buy-hover-bg: var(--yellow); --buy-hover-ink: var(--royal-2); }
+.finder__buy { display: inline-flex; align-items: center; gap: var(--s-1); height: 44px; padding: 0 var(--s-3); border-radius: var(--r-pill); font-weight: 700; background: #fff; color: var(--buy-ink); transition: transform var(--t-mid) var(--ease), background var(--t-mid) var(--ease), color var(--t-mid) var(--ease); }
+.finder__buy svg { width: 18px; height: 18px; }
+.finder__buy:hover { transform: translateY(-2px); background: var(--buy-hover-bg); color: var(--buy-hover-ink); }
+@media (max-width: 1100px) { .finder__form { grid-template-columns: 1fr; } .finder__form .btn { width: 100%; } }
+.buylist { scroll-margin-top: 96px; }
