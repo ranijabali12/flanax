@@ -604,3 +604,72 @@ input { caret-color: var(--sky); }
   .js .section__head.reveal.in .h2 { animation: none; }
   .btn:active, .chip:active, .icon-btn:active { scale: 1; }
 }
+
+/* =========================================================
+   Aviso de projeto independente, guia por sintoma,
+   automedicação responsável e canais oficiais
+   ========================================================= */
+:root { --notice-h: 28px; --bar-h: 80px; --header-h: calc(var(--bar-h) + var(--notice-h)); --accent: var(--sky); --accent-ink: var(--royal); }
+@media (max-width: 640px) { :root { --bar-h: 64px; } }
+.notice { position: fixed; top: 0; left: 0; right: 0; z-index: 55; height: calc(var(--notice-h) + env(safe-area-inset-top, 0px)); margin: 0; padding: env(safe-area-inset-top, 0px) var(--gutter) 0; display: flex; align-items: center; justify-content: center; gap: var(--s-1); background: var(--ink); color: var(--bg); font-size: var(--t-12); font-weight: 500; white-space: nowrap; overflow: hidden; }
+.notice a { text-decoration: underline; text-underline-offset: 2px; }
+@media (max-width: 480px) { .notice a { display: none; } }
+.topbar { top: calc(var(--notice-h) + env(safe-area-inset-top, 0px)); padding-top: 0; height: var(--bar-h); }
+.topbar.is-scrolled { height: 64px; }
+
+.footer__legal a { text-decoration: underline; text-underline-offset: 3px; }
+.finder__privacy { font-size: var(--t-12); opacity: .85; }
+.finder__privacy a { text-decoration: underline; text-underline-offset: 2px; }
+
+.care { margin-top: var(--s-16); scroll-margin-top: calc(var(--header-h) + var(--s-2)); }
+
+/* Guia: chips de situação e as bulas que a citam */
+.guia { display: grid; gap: var(--s-3); padding: var(--s-5); border-radius: var(--r-4); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.guia__chips { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.guia__chips .chip.is-active { background: var(--ink); color: var(--bg); box-shadow: none; }
+.guia__out { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--s-2); }
+.guia__item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px var(--s-2); align-content: start; padding: var(--s-3); border-radius: var(--r-3); background: var(--bg); text-align: left; animation: rowIn 420ms var(--ease) both; animation-delay: calc(var(--i) * 50ms); transition: background var(--t-mid) var(--ease), transform var(--t-mid) var(--ease); }
+.guia__item b { font-size: var(--t-20); color: var(--accent-ink); }
+.guia__item span { grid-column: 1; font-size: var(--t-14); color: var(--ink-2); }
+.guia__item i { grid-column: 2; grid-row: 1; font-style: normal; color: var(--muted); transition: transform var(--t-mid) var(--ease); }
+.guia__item:hover { background: var(--bg-2); }
+.guia__item:hover i { transform: translateX(4px); }
+.guia__kids { padding-top: var(--s-2); border-top: 1px solid var(--line); font-size: var(--t-14); color: var(--ink-2); max-width: 80ch; }
+
+/* Guia do Flanax: os quatro grupos da indicação */
+.indic { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-2); }
+.indic__card { display: grid; gap: var(--s-1); align-content: start; padding: var(--s-4); border-radius: var(--r-4); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.indic__card h3 { font-size: var(--t-24); line-height: 1.1; color: var(--accent-ink); }
+.indic__card p { color: var(--muted); font-size: var(--t-14); }
+.indic__card ul { list-style: none; margin: var(--s-1) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.indic__card li { padding: 4px 12px; border-radius: var(--r-pill); background: var(--bg); font-size: var(--t-14); font-weight: 600; }
+@media (max-width: 960px) { .indic { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .indic { grid-template-columns: 1fr; } }
+
+/* Automedicação: lista numerada em duas colunas */
+.rules { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s-6); counter-reset: rule; }
+.rules li { counter-increment: rule; display: grid; align-content: start; grid-template-columns: 48px minmax(0, 1fr); gap: 2px var(--s-2); padding: var(--s-3) 0; border-top: 1px solid var(--line); }
+.rules li::before { content: counter(rule, decimal-leading-zero); grid-row: span 2; font-family: var(--f-mono); font-size: var(--t-14); color: var(--accent-ink); font-variant-numeric: tabular-nums; padding-top: 3px; }
+.rules b { font-size: var(--t-18); }
+.rules span { color: var(--ink-2); }
+@media (max-width: 760px) { .rules { grid-template-columns: 1fr; } }
+
+/* Canais oficiais */
+.info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-2); }
+.info__card { display: grid; grid-template-rows: auto 1fr auto; gap: var(--s-2); padding: var(--s-4); border-radius: var(--r-4); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.info__card h3 { font-size: var(--t-20); }
+.info__card p { color: var(--ink-2); font-size: var(--t-14); }
+.info__links { display: grid; gap: 6px; justify-items: start; }
+.info__links a { font-weight: 600; color: var(--accent-ink); text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 35%, transparent); text-underline-offset: 3px; transition: text-decoration-color var(--t-mid) var(--ease); }
+.info__links a:hover { text-decoration-color: currentColor; }
+@media (max-width: 960px) { .info { grid-template-columns: 1fr; } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --accent-ink: var(--accent); } }
+:root[data-theme="dark"] { --accent-ink: var(--accent); }
+
+/* Página de privacidade */
+.doc { max-width: 72ch; padding-block: calc(var(--header-h) + var(--s-6)) var(--s-12); display: grid; gap: var(--s-2); }
+.doc h1 { font-size: clamp(var(--t-32), 5vw, var(--t-48)); line-height: 1.05; }
+.doc h2 { font-size: var(--t-20); margin-top: var(--s-3); }
+.doc p, .doc li { color: var(--ink-2); }
+.doc a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+.doc__back { font-weight: 600; }

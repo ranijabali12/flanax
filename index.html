@@ -5,11 +5,19 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'self' blob:; manifest-src 'self'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Flanax · Bayer</title>
+  <title>Flanax · projeto conceitual</title>
   <meta name="description" content="Flanax naproxeno sódico 275 mg e 550 mg e o Flanax XR 660 mg de dupla camada. As cinco embalagens em 3D." />
-  <meta property="og:title" content="Flanax · Bayer" />
+  <meta property="og:title" content="Flanax · projeto conceitual" />
   <meta property="og:description" content="Flanax 275 mg, 550 mg e Flanax XR 660 mg de dupla camada." />
   <meta property="og:locale" content="pt_BR" />
+  <meta property="og:url" content="https://ranijabali12.github.io/flanax/" />
+  <link rel="canonical" href="https://ranijabali12.github.io/flanax/" />
+  <!-- shortcut: imagem de prévia em WebP (sem conversor aqui); trocar por PNG/JPG 1200x630 se algum app não exibir -->
+  <meta property="og:image" content="https://ranijabali12.github.io/flanax/assets/arte/flanax-xr-v2.webp" />
+  <meta property="og:image:type" content="image/webp" />
+  <meta property="og:image:alt" content="Embalagem do Flanax XR 660 mg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Flanax · projeto conceitual", "url": "https://ranijabali12.github.io/flanax/", "inLanguage": "pt-BR", "description": "Projeto conceitual independente de interface, sem vínculo com a Bayer.", "about": [{"@type": "Drug", "name": "Flanax", "activeIngredient": "naproxeno sódico"}, {"@type": "Drug", "name": "Flanax XR", "activeIngredient": "naproxeno sódico"}]}</script>
   <meta name="theme-color" content="#123A9C" />
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg?v=2" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-32.png?v=2" />
@@ -17,11 +25,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&family=Roboto+Condensed:wght@100..900&family=Barlow:ital,wght@0,500;0,600;0,700;0,800;1,600;1,700;1,800;1,900&family=Barlow+Condensed:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=31" />
+  <link rel="stylesheet" href="styles.css?v=32" />
   <script src="boot.js?v=30"></script>
 </head>
 <body>
   <a class="skip" href="#app">Pular para o conteúdo</a>
+  <p class="notice" role="note">Projeto conceitual independente, sem vínculo com a Bayer. <a href="privacidade.html">Privacidade</a></p>
   <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
   <div class="scroll-progress" aria-hidden="true"><span></span></div>
 
@@ -275,6 +284,7 @@
               <button class="finder__geo" type="button" id="geoBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3" stroke="currentColor" stroke-width="1.6"/></svg>Farmácias perto de mim</button>
             </div>
             <p class="finder__msg" id="cepMsg" aria-live="polite"></p>
+            <p class="finder__privacy">O CEP e a localização vão direto para o Google Maps; este site não guarda nada. <a href="privacidade.html">Saiba mais</a></p>
             <a class="finder__link" href="https://www.flanax.com.br" target="_blank" rel="noopener">Site oficial do Flanax <span aria-hidden="true">↗</span></a>
           </aside>
 
@@ -289,6 +299,68 @@
           <div class="buylist__rows" id="buyRows"></div>
           <p class="buylist__note">Links para as páginas dos produtos nas lojas on-line das redes. Preço e estoque são definidos por cada farmácia.</p>
         </section>
+        <section class="care" id="guia" aria-labelledby="guiaTitle">
+          <header class="section__head reveal">
+            <span class="eyebrow">Guia por sintoma</span>
+            <h2 class="h2" id="guiaTitle">Para que dor?</h2>
+            <p class="section__sub">As situações citadas na indicação da bula do Flanax 275 mg, 550 mg e XR. Uso adulto. O guia não substitui o médico nem o farmacêutico.</p>
+          </header>
+          <div class="indic">
+            <article class="indic__card reveal"><h3>Inflamação</h3><p>Dores agudas causadas por inflamação.</p><ul><li>Dor de garganta</li></ul></article>
+            <article class="indic__card reveal"><h3>Dor e febre</h3><p>Em adultos.</p><ul><li>Dor de cabeça</li><li>Dor de dente</li><li>Dor abdominal e pélvica</li><li>Gripe e resfriado</li></ul></article>
+            <article class="indic__card reveal"><h3>Músculos e articulações</h3><p>Dores musculares e articulares.</p><ul><li>Dor nas costas</li><li>Dor nas pernas</li><li>Torcicolo</li><li>Tendinite</li><li>Bursite</li><li>Cotovelo de tenista</li><li>Dor reumática</li></ul></article>
+            <article class="indic__card reveal"><h3>Depois de traumas</h3><p>Dor após traumas.</p><ul><li>Entorses</li><li>Distensões</li><li>Contusões</li><li>Lesões leves no esporte</li></ul></article>
+          </div>
+        </section>
+
+        <section class="care" aria-labelledby="usoTitle">
+          <header class="section__head reveal">
+            <span class="eyebrow">Automedicação responsável</span>
+            <h2 class="h2" id="usoTitle">Antes de tomar.</h2>
+          </header>
+          <ol class="rules">
+            <li class="reveal"><b>Leia a bula</b><span>Mesmo que você já conheça o remédio. Contraindicações e interações estão lá.</span></li>
+            <li class="reveal"><b>Um ativo de cada vez</b><span>Não junte o Flanax com outro anti-inflamatório, como ibuprofeno, diclofenaco ou ácido acetilsalicílico, sem orientação. Antigripais também podem ter esses ativos: confira o rótulo.</span></li>
+            <li class="reveal"><b>Respeite dose e intervalo</b><span>Use a dose e o intervalo da bula. Não aumente por conta própria.</span></li>
+            <li class="reveal"><b>Fale antes com o médico</b><span>Na gravidez, na amamentação, em crianças e idosos, e se você usa outros remédios ou tem doença crônica.</span></li>
+            <li class="reveal"><b>Sintoma que continua</b><span>Se a dor ou a febre persistirem ou mudarem, procure o médico.</span></li>
+            <li class="reveal"><b>Guarde com cuidado</b><span>Longe das crianças, na embalagem original, e confira a validade.</span></li>
+          </ol>
+        </section>
+
+        <section class="care" aria-labelledby="segTitle">
+          <header class="section__head reveal">
+            <span class="eyebrow">Segurança e contato</span>
+            <h2 class="h2" id="segTitle">Informação oficial.</h2>
+          </header>
+          <div class="info">
+            <article class="info__card reveal">
+              <h3>Relatar efeito adverso</h3>
+              <p>Teve alguma reação depois de usar um medicamento? Avise o fabricante e a Anvisa. A notificação ajuda a monitorar a segurança do remédio.</p>
+              <div class="info__links">
+                <a href="tel:08007231010">SAC Bayer 0800 723 1010</a>
+                <a href="mailto:sac@bayer.com">sac@bayer.com</a>
+                <a href="https://www.gov.br/anvisa/pt-br/assuntos/fiscalizacao-e-monitoramento/notificacoes/vigimed" target="_blank" rel="noopener">Notificar no VigiMed, da Anvisa <span aria-hidden="true">↗</span></a>
+              </div>
+            </article>
+            <article class="info__card reveal">
+              <h3>Bula e registro</h3>
+              <p>A bula completa, do paciente e do profissional, fica no Bulário eletrônico da Anvisa. Registros: Reg. MS 1.7056.0047 (Flanax 275 mg e 550 mg) e Reg. MS 1.7056.0126 (Flanax XR).</p>
+              <div class="info__links">
+                <a href="https://consultas.anvisa.gov.br/#/bulario/" target="_blank" rel="noopener">Bulário eletrônico da Anvisa <span aria-hidden="true">↗</span></a>
+              </div>
+            </article>
+            <article class="info__card reveal">
+              <h3>Profissionais de saúde</h3>
+              <p>Médicos, dentistas e farmacêuticos encontram a bula do profissional no Bulário da Anvisa e as informações técnicas nos canais oficiais da Bayer.</p>
+              <div class="info__links">
+                <a href="https://www.bayer.com.br/" target="_blank" rel="noopener">Bayer Brasil <span aria-hidden="true">↗</span></a>
+                <a href="tel:08007231010">SAC 0800 723 1010</a>
+              </div>
+            </article>
+          </div>
+        </section>
+
       </div>
     </section>
   </main>
@@ -307,8 +379,8 @@
         </nav>
       </div>
       <div class="footer__legal">
-        <span>© <span id="year">2026</span> Bayer. Flanax® é marca registrada.</span>
-        <span>Projeto conceitual de interface.</span>
+        <span>© <span id="year">2026</span> Projeto conceitual independente, sem vínculo com a Bayer. Flanax® é marca da Bayer, citada só para fins de estudo.</span>
+        <span><a href="privacidade.html">Privacidade</a> · Reg. MS 1.7056.0047 (Flanax 275 mg e 550 mg) · Reg. MS 1.7056.0126 (Flanax XR)</span>
       </div>
     </div>
   </footer>
@@ -329,7 +401,7 @@
 
   <script src="catalog.js?v=30"></script>
   <script src="lojas.js?v=30"></script>
-  <script src="app.js?v=31"></script>
+  <script src="app.js?v=32"></script>
   <script type="module" src="boot3d.js?v=30"></script>
 </body>
 </html>
