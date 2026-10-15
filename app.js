@@ -22,10 +22,14 @@
 
   /* ---------- Tema ---------- */
   const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
-  $('#themeBtn').addEventListener('click', () => {
+  $('#themeBtn').addEventListener('click', e => {
     const next = isDark() ? 'light' : 'dark';
     const apply = () => { document.documentElement.dataset.theme = next; store.set('fx-theme', next); };
-    if (document.startViewTransition && !reduced) document.startViewTransition(apply); else apply();
+    if (document.startViewTransition && !reduced) {
+      const r = e.currentTarget.getBoundingClientRect(), s = document.documentElement.style;
+      s.setProperty('--vt-x', r.left + r.width / 2 + 'px'); s.setProperty('--vt-y', r.top + r.height / 2 + 'px');
+      document.startViewTransition(apply);
+    } else apply();
     toast(next === 'dark' ? 'Tema escuro ativado' : 'Tema claro ativado');
     drawMol();
   });
@@ -90,7 +94,7 @@
     if (el.dataset.done) return; el.dataset.done = 1;
     const target = +el.dataset.count; if (reduced || target > 1000) { el.textContent = target; return; }
     const t0 = performance.now();
-    const tick = now => { const p = Math.min((now - t0) / 800, 1), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; el.textContent = Math.round(target * e); if (p < 1) requestAnimationFrame(tick); };
+    const tick = now => { const p = Math.min((now - t0) / 800, 1), e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p); el.textContent = Math.round(target * e); if (p < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   }
 

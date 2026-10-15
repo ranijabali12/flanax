@@ -1,7 +1,7 @@
 /* =========================================================
    Flanax · Bayer
    Linguagem das caixas: azul royal com arco ciano, amarelo do logotipo,
-   laranja da linha 550 mg. Grade de 8px · transições 150–300ms ease-in-out.
+   laranja da linha 550 mg. Grade de 8px · estados 150–300ms com desaceleração, entradas autorais 500–900ms.
    ========================================================= */
 
 /* Layout: hero azul (como a frente da caixa) com a órbita sobre o arco;
@@ -41,7 +41,9 @@
   --s-6: 48px; --s-8: 64px; --s-10: 80px; --s-12: 96px; --s-16: 128px;
   --r-1: 8px; --r-2: 16px; --r-3: 24px; --r-4: 32px; --r-pill: 999px;
 
-  --ease: cubic-bezier(.45, 0, .55, 1);
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --ease-in: cubic-bezier(.55, 0, .75, .2);
+  --ease-io: cubic-bezier(.65, 0, .35, 1);
   --t-fast: 150ms; --t-mid: 220ms; --t-slow: 300ms;
   --wrap: 1280px; --gutter: var(--s-4); --header-h: 80px;
   --shadow: 0 24px 48px -30px rgba(11, 27, 69, .45);
@@ -158,8 +160,9 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 2px 6px; border-radi
 .view.is-leaving { display: block; animation: viewOut 200ms var(--ease) both; }
 @keyframes viewIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes viewOut { to { opacity: 0; transform: translateY(-8px); } }
-.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity var(--t-slow) var(--ease), transform var(--t-slow) var(--ease); transition-delay: var(--d, 0ms); }
-.js .reveal.in { opacity: 1; transform: none; }
+.js .reveal { opacity: 0; }
+.js .reveal.in { opacity: 1; animation: revealIn 800ms var(--ease) var(--d, 0ms) backwards; }
+@keyframes revealIn { from { opacity: 0; transform: translateY(32px); } }
 
 .section { padding-block: var(--s-16); }
 .section--tight { padding-block: 0 var(--s-16); }
@@ -456,7 +459,7 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 2px 6px; border-radi
 .lite .viewer__ring { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
   .js .reveal { opacity: 1; transform: none; }
   .hero__title .line > span { transform: none; }
 }
@@ -547,5 +550,57 @@ kbd { font-family: var(--f-mono); font-size: 11px; padding: 2px 6px; border-radi
 /* ---------- QA: contraste, barra de abas e movimento ---------- */
 .switch__thumb { background: color-mix(in srgb, var(--fam) 70%, #000); }
 @media (max-width: 400px) { .tabs__btn { padding: 0 8px; font-size: 11px; } .tabs__btn .dot { display: none; } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; } }
 .finder > p { opacity: 1; color: rgba(255, 255, 255, .94); }
+
+/* =========================================================
+   Movimento
+   Entradas desaceleram (expo-out); saídas aceleram e duram menos.
+   Momento autoral: a abertura do hero monta a embalagem em sequência:
+   a base sobe, o arco se desenha, o título emerge do corte e o painel
+   chega por último. O resto só confirma ação e explica mudança de estado.
+   ========================================================= */
+:root { --t-enter: 560ms; --t-focal: 900ms; }
+
+/* Abertura do hero */
+.sweep-dark { animation: sweepRise var(--t-focal) var(--ease) 60ms both; }
+@keyframes sweepRise { from { transform: translateY(35%); opacity: 0; } to { transform: none; opacity: 1; } }
+.sweep-arc { animation: draw 1600ms var(--ease) 320ms forwards; }
+.hero__title .line > span { transform: translateY(108%) rotate(2.5deg); transform-origin: 0 100%; animation: lineUp var(--t-focal) var(--ease) 260ms forwards; }
+.hero__title .line:nth-child(2) > span { animation-delay: 380ms; }
+@keyframes lineUp { from { filter: blur(8px); } to { transform: none; filter: none; } }
+.hero__copy .eyebrow { animation: fadeUp var(--t-enter) var(--ease) 120ms both; }
+.hero__lead { animation: fadeUp var(--t-enter) var(--ease) 560ms both; }
+.hud { animation: fadeUp 700ms var(--ease) 720ms both; }
+
+/* Troca de aba: entra devagar, sai rápido */
+.view.is-active { animation: viewIn 460ms var(--ease) both; }
+.view.is-leaving { animation: viewOut 180ms var(--ease-in) both; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+/* Títulos de seção: o texto sobe de dentro de um corte, como no hero */
+.js .section__head.reveal.in { animation-name: fadeOnly; animation-duration: 400ms; }
+.js .section__head.reveal.in .h2 { animation: headWipe 900ms var(--ease) calc(var(--d, 0ms) + 60ms) backwards; }
+@keyframes headWipe { from { clip-path: inset(0 0 100% 0); transform: translateY(.4em); } to { clip-path: inset(-10% -5% -20% -5%); transform: none; } }
+@keyframes fadeOnly { from { opacity: 0; } }
+
+/* Retorno de toque: os controles cedem um pouco ao clique */
+.btn { transition: transform var(--t-mid) var(--ease), background var(--t-mid) var(--ease), color var(--t-mid) var(--ease), box-shadow var(--t-mid) var(--ease), scale var(--t-fast) var(--ease); }
+.chip, .icon-btn { transition: background var(--t-mid) var(--ease), color var(--t-mid) var(--ease), box-shadow var(--t-mid) var(--ease), transform var(--t-fast) var(--ease), scale var(--t-fast) var(--ease); }
+.btn:active, .chip:active, .icon-btn:active { scale: .96; transition-duration: 80ms; }
+.palette[open]::backdrop { animation: fadeOnly 240ms var(--ease) both; }
+
+/* Troca de tema: o novo tema se espalha a partir do botão */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: themeWipe 640ms var(--ease-io); }
+@keyframes themeWipe { from { clip-path: circle(0 at var(--vt-x, 100%) var(--vt-y, 0)); } to { clip-path: circle(150vmax at var(--vt-x, 100%) var(--vt-y, 0)); } }
+
+/* Superfícies do navegador na paleta da marca */
+html { scrollbar-color: color-mix(in srgb, var(--sky) 60%, var(--bg-2)) var(--bg); }
+input { caret-color: var(--sky); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__title .line > span { transform: none; filter: none; }
+  .js .section__head.reveal.in .h2 { animation: none; }
+  .btn:active, .chip:active, .icon-btn:active { scale: 1; }
+}
